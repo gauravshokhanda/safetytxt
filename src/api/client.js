@@ -99,6 +99,7 @@ const Client = {
       {
         order: 'desc',
         optimize: true,
+        status: 'publish',
       },
       false,
     ),

@@ -114,6 +114,8 @@ class MyCourse extends Component {
 
     const response = await Client.course(param);
 
+    console.log(response,"response of  my courses ")
+
     this.setState({
       data: page !== 1 ? this.state.data.concat(response) : response,
       isLoadMore: response.length === 10,

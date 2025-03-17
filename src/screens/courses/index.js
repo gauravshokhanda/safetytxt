@@ -171,6 +171,8 @@ class Courses extends Component {
       param.category = categorySelect;
     }
     const response = await Client.course(param, false);
+    console.log(response, 'course response');
+    console.log(param, 'course params');
     const newData = [];
     for (let i = 0; i < response.length; i += 1) {
       const element = response[i];

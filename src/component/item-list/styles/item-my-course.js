@@ -33,7 +33,6 @@ export default StyleSheet.create({
     resizeMode: 'cover',
     backgroundColor: '#E5E5E5',
   },
-
   title: {
     fontFamily: 'Poppins-Medium',
     fontSize: 16,
