@@ -136,7 +136,7 @@ class Courses extends Component {
       // category: null,
       // tag: null,
       // learned: false,
-      optimize: true,
+      optimize: false,
     };
     if (keySearch) {
       param.search = keySearch;

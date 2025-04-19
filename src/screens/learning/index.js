@@ -276,6 +276,8 @@ class Learning extends Component {
     const {course} = this.props;
 
     const {items} = section;
+
+
     return (
       <View>
         {items.map((item, i) => (
@@ -696,6 +698,7 @@ class Learning extends Component {
       pageActive,
       isAssignment,
     } = this.state;
+    
 
     return (
       <View style={styles.container}>
@@ -819,6 +822,7 @@ class Learning extends Component {
                     })}
                   </Text>
                   <RenderDataHTML html={data?.content || ''} />
+
                   <TouchableOpacity
                     style={[styles.btnFinish, {marginTop: 10}]}
                     onPress={this.onStartQuiz}>
