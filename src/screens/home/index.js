@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react';
+import React, { PureComponent } from 'react';
 import {
   DeviceEventEmitter,
   Image,
@@ -8,19 +8,21 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import {withTranslation} from 'react-i18next';
-import {Images} from 'app-assets';
-import {connect} from 'react-redux';
+import { withTranslation } from 'react-i18next';
+import { Images } from 'app-assets';
+import { connect } from 'react-redux';
 import {
   ProgressCircle,
   PopularCourses,
   LearnToday,
   Instructor,
 } from 'app-component';
-import {Client} from 'app-api';
+import { Client } from 'app-api';
 import styles from './styles';
 import SkeletonFlatList from '../../component/common/skeleton/flatlist';
 import SkeletonCategory from '../../component/common/skeleton/category';
+import { Linking } from 'react-native';
+
 
 class Home extends PureComponent {
   constructor(props) {
@@ -59,7 +61,11 @@ class Home extends PureComponent {
       roles: ['lp_teacher', 'administrator'],
     };
 
-    const {user} = this.props;
+    const { user } = this.props;
+
+    const isLoggedIn = !!user?.token;
+    console.log(isLoggedIn, 'isLoggedIn');
+    console.log(user);
 
     if (user?.overview) {
       Client.getOverview(user.overview).then(response => {
@@ -68,16 +74,18 @@ class Home extends PureComponent {
         });
       });
     }
-    Client.topCoursesWithStudent().then(response => {
+    Client.topCoursesWithStudent(!!user?.token).then(response => {
       this.setState({
         topCourseWithStudent: response,
         loading2: false,
       });
     });
+
     Client.newCourses().then(response => {
       this.setState({
         dataNewCourse: response,
         loading3: false,
+        preview: isLoggedIn,
       });
     });
     Client.getCategoryHome().then(response => {
@@ -95,16 +103,16 @@ class Home extends PureComponent {
   }
 
   refreshOverview = async () => {
-    const {user} = this.props;
+    const { user } = this.props;
 
     if (user?.overview) {
       const response = await Client.getOverview(user.overview);
-      this.setState({dataOverview: response});
+      this.setState({ dataOverview: response });
     }
   };
 
   onBack = () => {
-    const {navigation} = this.props;
+    const { navigation } = this.props;
     navigation.goBack();
   };
 
@@ -117,7 +125,7 @@ class Home extends PureComponent {
       loading4: true,
     });
     await this.onGetData();
-    this.setState({refreshing: false});
+    this.setState({ refreshing: false });
   };
 
   render() {
@@ -134,7 +142,7 @@ class Home extends PureComponent {
       loading4,
     } = this.state;
 
-    const {t, navigation, user, notifications} = this.props;
+    const { t, navigation, user, notifications } = this.props;
 
     return (
       <View style={styles.container}>
@@ -146,7 +154,7 @@ class Home extends PureComponent {
             />
           }
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingBottom: 150}}>
+          contentContainerStyle={{ paddingBottom: 150 }}>
           <Image source={Images.bannerHome} style={styles.imgBanner} />
           <View style={styles.header}>
             <Image source={Images.iconHome} style={styles.iconHome} />
@@ -166,7 +174,7 @@ class Home extends PureComponent {
               <View>
                 <TouchableOpacity
                   onPress={() => navigation.navigate('NotificationsScreen')}
-                  hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   style={styles.iconNotification}>
                   <Image
                     source={Images.iconNotification}
@@ -174,7 +182,7 @@ class Home extends PureComponent {
                   />
                   {notifications?.list[0]?.notification_id &&
                     notifications.list[0].notification_id >
-                      notifications?.lastID && <View style={styles.dot} />}
+                    notifications?.lastID && <View style={styles.dot} />}
                 </TouchableOpacity>
               </View>
             )}
@@ -188,7 +196,7 @@ class Home extends PureComponent {
               }}>
               <TouchableOpacity
                 onPress={() => navigation.navigate('ProfileStackScreen')}
-                style={{flexDirection: 'row'}}>
+                style={{ flexDirection: 'row' }}>
                 <Image
                   style={styles.avatar}
                   source={{
@@ -197,7 +205,7 @@ class Home extends PureComponent {
                       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMjCj43UJiVu-3Qp9b5yj-SwLGR-kndCzqLaiMv5SMkITd4CcbQQ7vX_CEZd-xxqka8ZM&usqp=CAU',
                   }}
                 />
-                <View style={{marginLeft: 15}}>
+                <View style={{ marginLeft: 15 }}>
                   <Text style={styles.fullname}>{user?.info?.name}</Text>
                   <Text style={styles.email}>{user?.info?.email}</Text>
                 </View>
@@ -223,7 +231,7 @@ class Home extends PureComponent {
                   backgroundColor="#F6F6F6"
                   progressColor="#958CFF"
                 />
-                <View style={{marginLeft: 24}}>
+                <View style={{ marginLeft: 24 }}>
                   <View style={styles.viewItem}>
                     <Image
                       source={Images.iconLession}
@@ -236,13 +244,12 @@ class Home extends PureComponent {
                           style={[
                             styles.progress,
                             {
-                              width: `${
-                                (dataOverview.course_data?.result?.items?.lesson
+                              width: `${(dataOverview.course_data?.result?.items?.lesson
                                   ?.completed /
                                   dataOverview.course_data?.result?.items
                                     ?.lesson?.total) *
                                 100
-                              }%`,
+                                }%`,
                               backgroundColor: '#FFD336',
                             },
                           ]}
@@ -259,13 +266,12 @@ class Home extends PureComponent {
                           style={[
                             styles.progress,
                             {
-                              width: `${
-                                (dataOverview.course_data?.result?.items?.quiz
+                              width: `${(dataOverview.course_data?.result?.items?.quiz
                                   ?.completed /
                                   dataOverview.course_data?.result?.items?.quiz
                                     ?.total) *
                                 100
-                              }%`,
+                                }%`,
                               backgroundColor: '#41DBD2',
                             },
                           ]}
@@ -276,33 +282,32 @@ class Home extends PureComponent {
 
                   {dataOverview.course_data?.result?.items?.assignment?.total >
                     0 && (
-                    <View style={styles.viewItem}>
-                      <Image
-                        source={Images.iconAssignment}
-                        style={styles.iconItem}
-                      />
-                      <View>
-                        <Text style={styles.txtItem}>{t('assignment')}</Text>
-                        <View style={styles.line}>
-                          <View
-                            style={[
-                              styles.progress,
-                              {
-                                width: `${
-                                  (dataOverview.course_data?.result?.items
-                                    ?.assignment?.completed /
-                                    dataOverview.course_data?.result?.items
-                                      ?.assignment?.total) *
-                                  100
-                                }%`,
-                                backgroundColor: '#958CFF',
-                              },
-                            ]}
-                          />
+                      <View style={styles.viewItem}>
+                        <Image
+                          source={Images.iconAssignment}
+                          style={styles.iconItem}
+                        />
+                        <View>
+                          <Text style={styles.txtItem}>{t('assignment')}</Text>
+                          <View style={styles.line}>
+                            <View
+                              style={[
+                                styles.progress,
+                                {
+                                  width: `${(dataOverview.course_data?.result?.items
+                                      ?.assignment?.completed /
+                                      dataOverview.course_data?.result?.items
+                                        ?.assignment?.total) *
+                                    100
+                                    }%`,
+                                  backgroundColor: '#958CFF',
+                                },
+                              ]}
+                            />
+                          </View>
                         </View>
                       </View>
-                    </View>
-                  )}
+                    )}
                 </View>
               </View>
               <TouchableOpacity
@@ -314,7 +319,7 @@ class Home extends PureComponent {
                 style={styles.container}>
                 <Text
                   numberOfLines={1}
-                  style={[styles.overTitle, {marginTop: 30}]}>
+                  style={[styles.overTitle, { marginTop: 30 }]}>
                   {dataOverview?.name}
                 </Text>
                 <Text style={styles.txt1}>
@@ -338,6 +343,68 @@ class Home extends PureComponent {
               <Text style={styles.titleList}>{t('home.category')}</Text>
               <Image source={Images.FocusonImage} style={styles.logo} />
             </View>
+            <View
+              style={{
+                backgroundColor: '#fff',
+                margin: 16,
+                padding: 20,
+                borderRadius: 12,
+                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOpacity: 0.1,
+                shadowOffset: { width: 0, height: 2 },
+                shadowRadius: 4,
+                elevation: 4,
+              }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  marginBottom: 10,
+                }}>
+                Revolutionizing Safety, Compliance, and Workforce Solutions
+              </Text>
+              <TouchableOpacity
+                onPress={() => Linking.openURL('https://SafetyTXT.com')}
+
+                style={{
+                  backgroundColor: '#008CFF',
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  borderRadius: 30,
+                  marginVertical: 10,
+                }}>
+                <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                  CONTACT US!
+                </Text>
+              </TouchableOpacity>
+              <View
+  style={{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 10,
+  }}>
+  <Text
+    style={{
+      color: '#3B73D1',
+      fontWeight: 'bold',
+      fontSize: 16,
+    }}>
+    SafetyTXT.com
+  </Text>
+  <Text
+    style={{
+      fontSize: 16,
+      fontWeight: 'bold',
+    }}>
+    (800)342-3023
+  </Text>
+</View>
+
+            </View>
+
             {/* {dataCate && dataCate.length > 0 && (
               <LearnToday
                 navigation={navigation}
@@ -355,7 +422,7 @@ class Home extends PureComponent {
               <Text style={styles.titleList}>{t('home.popular')}</Text>
               <PopularCourses
                 navigation={navigation}
-                contentContainerStyle={{paddingHorizontal: 16}}
+                contentContainerStyle={{ paddingHorizontal: 16 }}
                 data={topCourseWithStudent}
                 horizontal
               />
@@ -367,23 +434,23 @@ class Home extends PureComponent {
               <SkeletonFlatList />
             </View>
           )}
-          {dataNewCourse && dataNewCourse.length > 0 && (
+          {/* {dataNewCourse && dataNewCourse.length > 0 && (
             <View style={styles.viewList}>
               <Text style={styles.titleList}>{t('home.new')}</Text>
               <PopularCourses
                 navigation={navigation}
-                contentContainerStyle={{paddingHorizontal: 16}}
+                contentContainerStyle={{ paddingHorizontal: 16 }}
                 data={dataNewCourse}
                 horizontal
               />
             </View>
-          )}
-          {loading3 && (
+          )} */}
+          {/* {loading3 && (
             <View style={styles.viewList}>
               <Text style={styles.titleList}>{t('home.new')}</Text>
               <SkeletonFlatList />
             </View>
-          )}
+          )} */}
 
           {/* {dataInstructor && dataInstructor.length > 0 && (
             <View style={styles.viewList}>
@@ -404,7 +471,7 @@ class Home extends PureComponent {
           )} */}
           {loading4 && (
             <View style={styles.viewList}>
-              <Text style={[styles.titleList, {marginBottom: 8}]}>
+              <Text style={[styles.titleList, { marginBottom: 8 }]}>
                 {t('instructor')}
               </Text>
               <SkeletonFlatList
@@ -420,11 +487,11 @@ class Home extends PureComponent {
     );
   }
 }
-const mapStateToProps = ({user, notifications}) => ({
+const mapStateToProps = ({ user, notifications }) => ({
   user,
   notifications,
 });
-const mapDispatchToProps = dispatch => ({dispatch});
+const mapDispatchToProps = dispatch => ({ dispatch });
 
 export default connect(
   mapStateToProps,

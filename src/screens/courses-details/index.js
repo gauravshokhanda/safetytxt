@@ -1242,6 +1242,7 @@ class CoursesDetails extends Component {
                   style={styles.btnAddToCart}
                   onPress={() => this.addToCard(String(data.id))}>
                   <Text style={styles.txtAddToCart}>
+                  (ID: {data.id})
                     {t('singleCourse.btnAddToCart')}
                   </Text>
                 </TouchableOpacity>

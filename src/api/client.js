@@ -3,13 +3,23 @@ import {config} from './config';
 const Client = {
   login: params => config.post('/wp-json/learnpress/v1/token', params),
 
-  register: params =>
-    config.post('/wp-json/learnpress/v1/token/register', params),
+  register: params => {
+    console.log('Register Params:', params);
+    return config.post('/wp-json/learnpress/v1/token/register', params);
+  },
 
   course: (params = {}, randomVersion = true) => {
     console.log(params);
     return config.get(
       '/wp-json/learnpress/v1/courses',
+      {...params},
+      randomVersion,
+    );
+  },
+  Newcourse: (params = {}, randomVersion = true) => {
+    console.log(params);
+    return config.get(
+      '/wp-json/learnpress/v1/courses1',
       {...params},
       randomVersion,
     );
@@ -84,18 +94,20 @@ const Client = {
       params,
     ),
 
-  topCoursesWithStudent: () =>
+  topCoursesWithStudent: (isLoggedIn = false) =>
     config.get(
       '/wp-json/learnpress/v1/courses',
       {
-        popular: true,
+        popular: false,
+
+        restrict: 'public',
       },
       false,
     ),
 
   newCourses: () =>
     config.get(
-      '/wp-json/learnpress/v1/courses',
+      '/wp-json/learnpress/v1/courses1',
       {
         order: 'desc',
         optimize: true,
