@@ -24,6 +24,18 @@ const Client = {
       randomVersion,
     );
   },
+  Newcourse2: (params = {}, randomVersion = true) => {
+    console.log(params);
+    return config.get(
+      '/wp-json/learnpress/v1/courses2',
+      {...params},
+      randomVersion,
+    );
+  },
+
+  courseDetailNewRestrict: id =>
+    config.get(`/wp-json/learnpress/v1/courses3?courses_id=${id}`),
+
   courseDetail: id => config.get(`/wp-json/learnpress/v1/courses/${id}`),
 
   lessonWithId: id => config.get(`/wp-json/learnpress/v1/lessons/${id}`),

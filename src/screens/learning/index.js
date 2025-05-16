@@ -92,6 +92,7 @@ class Learning extends Component {
       isAssignment: false,
     });
     const response = await Client.quiz(this.item.id);
+    console.log(response,"quiz response")
     this.setState({
       data: response,
       isLesson: false,
@@ -982,25 +983,39 @@ class Learning extends Component {
                       flexDirection: 'row',
                       alignItems: 'center',
                     }}>
-                    <CountDown
-                      duration={dataQuiz?.total_time}
-                      callBack={this.callBackFinishQuiz}
-                      textStyle={{
-                        color: 'red',
-                        fontSize: 12,
-                        fontFamily: 'Poppins-Medium',
-                      }}
-                    />
-                    <Text
-                      numberOfLines={1}
-                      style={{
-                        color: 'red',
-                        fontFamily: 'Poppins',
-                        fontSize: 12,
-                      }}>
-                      {' '}
-                      {t('learningScreen.quiz.timeRemaining')}
-                    </Text>
+                 {dataQuiz?.total_time > 0 ? (
+  <>
+    <CountDown
+      duration={dataQuiz.total_time}
+      callBack={this.callBackFinishQuiz}
+      textStyle={{
+        color: 'red',
+        fontSize: 12,
+        fontFamily: 'Poppins-Medium',
+      }}
+    />
+    <Text
+      numberOfLines={1}
+      style={{
+        color: 'red',
+        fontFamily: 'Poppins',
+        fontSize: 12,
+      }}>
+      {t('learningScreen.quiz.timeRemaining')}
+    </Text>
+  </>
+) : (
+  <Text
+    numberOfLines={1}
+    style={{
+      color: 'green',
+      fontFamily: 'Poppins',
+      fontSize: 12,
+    }}>
+    Unlimted{/* Add this key to your translation */}
+  </Text>
+)}
+
                   </View>
                 </View>
                 {dataQuiz.questions.length > 1 && (

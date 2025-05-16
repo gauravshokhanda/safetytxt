@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   Text,
   View,
@@ -14,17 +14,17 @@ import {
   Keyboard,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {withTranslation} from 'react-i18next';
-import {Client} from 'app-api';
-import {Images} from 'app-assets';
+import { withTranslation } from 'react-i18next';
+import { Client } from 'app-api';
+import { Images } from 'app-assets';
 import IconI from 'react-native-vector-icons/Ionicons';
 import IconF from 'react-native-vector-icons/Feather';
-import {Rating} from 'react-native-ratings';
+import { Rating } from 'react-native-ratings';
 import Accordion from 'react-native-collapsible/Accordion';
-import {connect} from 'react-redux';
-import {tronLog} from 'app-common';
-import {RenderDataHTML} from 'app-component';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { connect } from 'react-redux';
+import { tronLog } from 'app-common';
+import { RenderDataHTML } from 'app-component';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import {
   getAvailablePurchases,
   initConnection,
@@ -37,11 +37,11 @@ import {
   requestPurchase,
 } from 'react-native-iap';
 import styles from './styles';
-import {showLoading} from '../../actions/common';
-import {saveCourse} from '../../actions/course';
-import {saveDataWishlist} from '../../actions/wishlist';
-import {saveProductIAP} from '../../actions/product-iap';
-import {setOverview} from '../../actions/user';
+import { showLoading } from '../../actions/common';
+import { saveCourse } from '../../actions/course';
+import { saveDataWishlist } from '../../actions/wishlist';
+import { saveProductIAP } from '../../actions/product-iap';
+import { setOverview } from '../../actions/user';
 import WebView from 'react-native-webview';
 
 // PRODUCTS_IAP moved to src/config/index.js
@@ -54,7 +54,7 @@ class CoursesDetails extends Component {
       review: null,
       reviewMessage: '',
       isWishlist: false,
-
+      restrict: null,
       titleRating: '',
       contentRating: '',
       starRating: 5,
@@ -112,7 +112,7 @@ class CoursesDetails extends Component {
   };
 
   refreshOverviewHomeScreen = async () => {
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
 
     dispatch(setOverview(this.id));
 
@@ -120,7 +120,7 @@ class CoursesDetails extends Component {
   };
 
   inAppPurchase = async () => {
-    const {t, dispatch} = this.props;
+    const { t, dispatch } = this.props;
 
     try {
       if (Platform.OS === 'android') {
@@ -153,6 +153,7 @@ class CoursesDetails extends Component {
 
               if (verifyReceipt.status === 'success') {
                 const response = await Client.courseDetail(this.id);
+                console.log(response, "response success")
                 await dispatch(saveCourse(response));
               } else {
                 throw new Error(
@@ -177,12 +178,12 @@ class CoursesDetails extends Component {
   };
 
   initConnectIAP = async () => {
-    const {dispatch, productIAP} = this.props;
+    const { dispatch, productIAP } = this.props;
 
     await dispatch(showLoading(true));
 
     try {
-      let {ids} = productIAP;
+      let { ids } = productIAP;
 
       if (ids.length === 0) {
         const response = await Client.getProductIAP();
@@ -198,7 +199,7 @@ class CoursesDetails extends Component {
 
       await initConnection();
 
-      await getProducts({skus: ids});
+      await getProducts({ skus: ids });
     } catch (e) {
       console.log('error', e.message);
     }
@@ -207,23 +208,48 @@ class CoursesDetails extends Component {
   };
 
   refreshData = async () => {
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     this.setState({
       refreshing: true,
     });
     const response = await Client.courseDetail(this.id);
+    console.log(response, "response 1")
     dispatch(saveCourse(response));
-    this.setState({refreshing: false});
+    this.setState({ refreshing: false });
   };
 
+  fetchRestrictValue = async (id) => {
+    try {
+      console.log(id,'course iiid')
+      const response = await fetch(`https://safetytxt.com/wp-json/learnpress/v1/courses3?course_id=${id}`);
+      const data = await response.json();
+  
+      console.log('Restrict API Raw Response:', data);
+  
+      this.setState({ restrict: data?.restrict || null });
+  
+      return data; // 👈 return full response if needed
+    } catch (error) {
+      console.error('Error fetching restrict value:', error);
+      this.setState({ restrict: null });
+      return null;
+    }
+  };
+  
+
   async getData() {
-    const {route, dispatch, user} = this.props;
+    const { route, dispatch, user } = this.props;
     try {
       await dispatch(showLoading(true));
 
       this.id = route.params?.id;
 
       const response = await Client.courseDetail(this.id);
+      console.log(this.id, 'course id')
+      console.log(response, "response data")
+
+      await this.fetchRestrictValue(this.id);
+
 
       await dispatch(showLoading(false));
 
@@ -235,7 +261,7 @@ class CoursesDetails extends Component {
           courseWishlist.status === 'success' &&
           courseWishlist.data.in_wishlist !== 'no'
         ) {
-          this.setState({isWishlist: courseWishlist?.data?.in_wishlist});
+          this.setState({ isWishlist: courseWishlist?.data?.in_wishlist });
         }
 
         this.getRating({
@@ -248,6 +274,7 @@ class CoursesDetails extends Component {
     }
   }
 
+
   getRating = async params => {
     const review = await Client.getReview(this.id, params);
     if (review.status === 'success') {
@@ -259,7 +286,7 @@ class CoursesDetails extends Component {
   };
 
   componentWillUnmount() {
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
 
     dispatch(saveCourse(null));
 
@@ -292,7 +319,7 @@ class CoursesDetails extends Component {
   }
 
   handleBackPress = () => {
-    const {navigation} = this.props;
+    const { navigation } = this.props;
 
     if (navigation.canGoBack()) {
       navigation.goBack();
@@ -300,7 +327,7 @@ class CoursesDetails extends Component {
       // Go to Home page
       navigation.reset({
         index: 0,
-        routes: [{name: 'HomeTabScreen'}],
+        routes: [{ name: 'HomeTabScreen' }],
       });
     }
 
@@ -308,7 +335,7 @@ class CoursesDetails extends Component {
   };
 
   goBack = () => {
-    const {navigation} = this.props;
+    const { navigation } = this.props;
 
     if (navigation.canGoBack()) {
       navigation.goBack();
@@ -316,13 +343,13 @@ class CoursesDetails extends Component {
       // Go to Home page
       navigation.reset({
         index: 0,
-        routes: [{name: 'HomeTabScreen'}],
+        routes: [{ name: 'HomeTabScreen' }],
       });
     }
   };
 
   onNavigateLearning = (item, index) => {
-    const {navigation} = this.props;
+    const { navigation } = this.props;
 
     navigation.navigate('LearningScreen', {
       item,
@@ -331,7 +358,7 @@ class CoursesDetails extends Component {
     });
   };
 
-  renderItemFilter = ({item}) => {
+  renderItemFilter = ({ item }) => {
     return (
       <TouchableOpacity
         style={{
@@ -351,8 +378,8 @@ class CoursesDetails extends Component {
   };
 
   renderItemRating = () => {
-    const {review} = this.state;
-    const {t, navigation} = this.props;
+    const { review } = this.state;
+    const { t, navigation } = this.props;
 
     if (!review) {
       return null;
@@ -388,7 +415,7 @@ class CoursesDetails extends Component {
               />
             </View>
             <Text style={styles.titleRating}>{item.title}</Text>
-            <Text style={[styles.txtOverview, {marginTop: 5}]}>
+            <Text style={[styles.txtOverview, { marginTop: 5 }]}>
               {item.content}
             </Text>
           </View>
@@ -411,7 +438,7 @@ class CoursesDetails extends Component {
                 fontFamily: 'Poppins-Medium',
                 fontSize: 14,
               }}>
-              {t('singleCourse.showAllReview', {count: review?.total})}
+              {t('singleCourse.showAllReview', { count: review?.total })}
             </Text>
             <IconF name="chevron-right" size={18} />
           </TouchableOpacity>
@@ -424,7 +451,7 @@ class CoursesDetails extends Component {
     return (
       <View key={String(index)}>
         <View
-          style={[styles.subSectionTitle, {marginTop: 8, marginBottom: 11}]}>
+          style={[styles.subSectionTitle, { marginTop: 8, marginBottom: 11 }]}>
           <View style={styles.subSectionTitle}>
             <IconI name={isActive ? 'caret-up' : 'caret-down'} size={15} />
             <Text numberOfLines={1} style={styles.txtSubSection}>
@@ -438,7 +465,7 @@ class CoursesDetails extends Component {
   };
 
   renderBottomButton = () => {
-    const {course} = this.props;
+    const { course } = this.props;
     const data = course?.data;
     const courseStatus = data?.course_data?.status;
     const coursePassed = data?.course_data?.graduation;
@@ -446,7 +473,7 @@ class CoursesDetails extends Component {
     if (courseStatus === 'finished' && coursePassed === 'passed') {
       return (
         <TouchableOpacity
-          style={[styles.btnAddToCart, {marginTop: 10}]}
+          style={[styles.btnAddToCart, { marginTop: 10 }]}
           onPress={this.handleShowCertificate}>
           <Text style={styles.txtAddToCart}> Certificate</Text>
         </TouchableOpacity>
@@ -456,16 +483,16 @@ class CoursesDetails extends Component {
   };
 
   renderContent = (section, index) => {
-    const {course, user} = this.props;
+    const { course, user } = this.props;
     const data = course?.data;
-    const {items} = section;
+    const { items } = section;
     return (
       <View>
         {items.map((item, i) => (
           <TouchableOpacity
             key={String(i)}
             onPress={() => this.onNavigateLearning(item, index)}
-            style={[styles.subSectionTitle, {marginBottom: 5, marginLeft: 24}]}
+            style={[styles.subSectionTitle, { marginBottom: 5, marginLeft: 24 }]}
             disabled={!user?.token || item.locked}>
             <View style={styles.subSectionTitle}>
               {item.type === 'lp_lesson' && (
@@ -482,7 +509,7 @@ class CoursesDetails extends Component {
               </Text>
             </View>
 
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               {item.preview &&
                 !['completed', 'evaluated'].includes(item.status) && (
                   <IconI name="eye-outline" style={styles.iconPreview} />
@@ -509,7 +536,7 @@ class CoursesDetails extends Component {
   };
 
   onStart = async () => {
-    const {course} = this.props;
+    const { course } = this.props;
     const data = course?.data;
 
     if (data.sections.length > 0 && data.sections[0].items.length > 0) {
@@ -538,7 +565,7 @@ class CoursesDetails extends Component {
   };
 
   onEnroll = async () => {
-    const {dispatch, user} = this.props;
+    const { dispatch, user } = this.props;
 
     if (!user?.token) {
       return this.notLoggedIn();
@@ -562,7 +589,7 @@ class CoursesDetails extends Component {
   };
 
   onRetake = async () => {
-    const {t, dispatch} = this.props;
+    const { t, dispatch } = this.props;
     dispatch(showLoading());
     const param = {
       id: this.id,
@@ -580,13 +607,13 @@ class CoursesDetails extends Component {
   };
 
   onToggleWishlish = async () => {
-    const {dispatch, course, user} = this.props;
+    const { dispatch, course, user } = this.props;
 
     if (!user?.token) {
       return this.notLoggedIn();
     }
 
-    const {isWishlist} = this.state;
+    const { isWishlist } = this.state;
     const data = course?.data;
     const param = {
       id: data.id,
@@ -595,7 +622,7 @@ class CoursesDetails extends Component {
     const response = await Client.addRemoveWishlist(param);
     dispatch(showLoading(false));
     if (response.status === 'success') {
-      this.setState({isWishlist: !isWishlist});
+      this.setState({ isWishlist: !isWishlist });
       dispatch(saveDataWishlist(response?.data?.items || []));
     } else {
       Alert.alert(response.message);
@@ -603,12 +630,12 @@ class CoursesDetails extends Component {
   };
 
   notLoggedIn = () => {
-    const {t, navigation} = this.props;
+    const { t, navigation } = this.props;
 
     return Alert.alert(t('alert.notLoggedIn'), t('alert.loggedIn'), [
       {
         text: t('alert.cancel'),
-        onPress: () => {},
+        onPress: () => { },
         style: 'cancel',
       },
       {
@@ -623,7 +650,7 @@ class CoursesDetails extends Component {
   };
 
   addToCard = async id => {
-    const {dispatch, user} = this.props;
+    const { dispatch, user } = this.props;
 
     if (!user?.token) {
       return this.notLoggedIn();
@@ -649,7 +676,7 @@ class CoursesDetails extends Component {
   };
 
   restorePurchases = async id => {
-    const {dispatch, user, t} = this.props;
+    const { dispatch, user, t } = this.props;
 
     if (!user?.token) {
       return this.notLoggedIn();
@@ -671,6 +698,7 @@ class CoursesDetails extends Component {
 
         if (verifyReceipt.status === 'success') {
           const response = await Client.courseDetail(this.id);
+          console.log(response, "response 2")
           await dispatch(saveCourse(response));
           await Alert.alert(
             t('alert.restorePurchases'),
@@ -694,16 +722,16 @@ class CoursesDetails extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.course !== this.props.course) {
-      console.log('Updated Course Data:', this.props.course);
+      // console.log('Updated Course Data:', this.props.course);
     }
     if (prevState.showCertificate !== this.state.showCertificate) {
-      console.log('Show Certificate State:', this.state.showCertificate);
+      // console.log('Show Certificate State:', this.state.showCertificate);
     }
   }
 
   submitRating = async () => {
-    const {t, dispatch} = this.props;
-    const {titleRating, contentRating, starRating} = this.state;
+    const { t, dispatch } = this.props;
+    const { titleRating, contentRating, starRating } = this.state;
     if (titleRating.trim() === '') {
       Alert.alert(t('singleCourse.review'), t('singleCourse.reviewTitleEmpty'));
       return;
@@ -761,7 +789,7 @@ class CoursesDetails extends Component {
         Alert.alert(
           'Error',
           data?.message ||
-            'Failed to fetch the certificate URL. Please try again later.',
+          'Failed to fetch the certificate URL. Please try again later.',
         );
       }
     } catch (error) {
@@ -775,7 +803,7 @@ class CoursesDetails extends Component {
   };
 
   handleShowCertificate = () => {
-    const {course, user} = this.props;
+    const { course, user } = this.props;
 
     const courseId = course?.data?.id; // Retrieve course_id from the course data
     const userId = user?.info?.id; // Retrieve user_id from Redux
@@ -789,9 +817,9 @@ class CoursesDetails extends Component {
   };
 
   render() {
-    const {course} = this.props;
+    const { course } = this.props;
     const data = course?.data;
-    const {showCertificate, certificateUrl} = this.state;
+    const { showCertificate, certificateUrl } = this.state;
 
     if (showCertificate && certificateUrl) {
       return (
@@ -815,8 +843,8 @@ class CoursesDetails extends Component {
               padding: 10,
               borderRadius: 30,
             }}
-            onPress={() => this.setState({showCertificate: false})}>
-            <Text style={{color: 'white', fontSize: 18}}>X</Text>
+            onPress={() => this.setState({ showCertificate: false })}>
+            <Text style={{ color: 'white', fontSize: 18 }}>X</Text>
           </TouchableOpacity>
 
           {/* WebView for Certificate */}
@@ -829,8 +857,8 @@ class CoursesDetails extends Component {
               overflow: 'hidden',
             }}>
             <WebView
-              source={{uri: certificateUrl}}
-              style={{flex: 1, borderRadius: 10, top: 50}}
+              source={{ uri: certificateUrl }}
+              style={{ flex: 1, borderRadius: 10, top: 50 }}
             />
           </View>
         </View>
@@ -846,7 +874,7 @@ class CoursesDetails extends Component {
       hiddenBottom,
     } = this.state;
     tronLog('review', review);
-    const {t, navigation} = this.props;
+    const { t, navigation } = this.props;
 
     return (
       <View style={styles.container}>
@@ -855,7 +883,7 @@ class CoursesDetails extends Component {
           <View style={styles.header1}>
             <TouchableOpacity
               onPress={this.goBack}
-              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
               <Image source={Images.iconBack} style={styles.iconBack} />
             </TouchableOpacity>
             <Text style={styles.title}>{t('singleCourse.title')}</Text>
@@ -867,7 +895,7 @@ class CoursesDetails extends Component {
           removeClippedSubviews={false}
           style={styles.content}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingBottom: 150}}
+          contentContainerStyle={{ paddingBottom: 150 }}
           keyboardShouldPersistTaps="handled"
           refreshControl={
             <RefreshControl
@@ -910,7 +938,7 @@ class CoursesDetails extends Component {
             </View>
             <Image
               source={Images.backgroundBanner}
-              style={{position: 'absolute', bottom: 0, width: '100%'}}
+              style={{ position: 'absolute', bottom: 0, width: '100%' }}
             />
           </FastImage>
           <View style={styles.content2}>
@@ -920,13 +948,13 @@ class CoursesDetails extends Component {
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Image source={Images.iconClock} style={styles.icon} />
                 <Text style={styles.txt3}>{data?.duration}</Text>
                 {data &&
                   data?.count_students !== '' &&
                   data?.count_students > 0 && (
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                       <Image source={Images.iconStudent} style={styles.icon1} />
                       <Text style={styles.txt3}>{data?.count_students}</Text>
                     </View>
@@ -984,11 +1012,11 @@ class CoursesDetails extends Component {
                 renderHeader={this.renderHeaderSession}
                 renderContent={this.renderContent}
                 onChange={value => {
-                  this.setState({activeSections: value});
+                  this.setState({ activeSections: value });
                 }}
               />
             ) : (
-              <Text style={{fontFamily: 'Poppins'}}>
+              <Text style={{ fontFamily: 'Poppins' }}>
                 {t('singleCourse.curriculumEmpty')}
               </Text>
             )}
@@ -1004,7 +1032,7 @@ class CoursesDetails extends Component {
                   routes: [
                     {
                       name: 'InstructorScreen',
-                      params: {instructor: data?.instructor},
+                      params: { instructor: data?.instructor },
                     },
                   ],
                 })
@@ -1029,7 +1057,7 @@ class CoursesDetails extends Component {
                   onPress={() =>
                     Linking.openURL(data?.instructor?.social?.facebook)
                   }
-                  style={{marginHorizontal: 6}}>
+                  style={{ marginHorizontal: 6 }}>
                   <IconF name="facebook" color="#D2D2D2" size={15} />
                 </TouchableOpacity>
                 {/* <TouchableOpacity
@@ -1042,7 +1070,7 @@ class CoursesDetails extends Component {
                     Linking.openURL(data?.instructor?.social?.twitter)
                   }
                   disabled={data?.instructor?.social?.twitter === ''}
-                  style={{marginHorizontal: 6}}>
+                  style={{ marginHorizontal: 6 }}>
                   <IconF name="twitter" color="#D2D2D2" size={14} />
                 </TouchableOpacity>
                 {/* <TouchableOpacity>
@@ -1053,7 +1081,7 @@ class CoursesDetails extends Component {
                     Linking.openURL(data?.instructor?.social?.youtube)
                   }
                   disabled={data?.instructor?.social?.youtube === ''}
-                  style={{marginHorizontal: 6}}>
+                  style={{ marginHorizontal: 6 }}>
                   <IconF name="youtube" color="#D2D2D2" size={16} />
                 </TouchableOpacity>
               </View>
@@ -1076,13 +1104,13 @@ class CoursesDetails extends Component {
                       ratingColor="#FBC815"
                       startingValue={Number(review?.rated).toFixed(1)}
                     />
-                    <Text style={[styles.txtOverview, {marginTop: 5}]}>
-                      {t('singleCourse.rating', {total: review?.total})}
+                    <Text style={[styles.txtOverview, { marginTop: 5 }]}>
+                      {t('singleCourse.rating', { total: review?.total })}
                     </Text>
                     <Text
                       style={[
                         styles.txtOverview,
-                        {marginTop: 10, textAlign: 'center'},
+                        { marginTop: 10, textAlign: 'center' },
                       ]}>
                       {reviewMessage}
                     </Text>
@@ -1111,9 +1139,9 @@ class CoursesDetails extends Component {
                   }}>
                   {t('singleCourse.leaveAReviewDescription')}
                 </Text>
-                <View style={{marginTop: 16, flex: 1, flexDirection: 'row'}}>
-                  <View style={{flex: 1, marginRight: 8}}>
-                    <Text style={{marginBottom: 10}}>
+                <View style={{ marginTop: 16, flex: 1, flexDirection: 'row' }}>
+                  <View style={{ flex: 1, marginRight: 8 }}>
+                    <Text style={{ marginBottom: 10 }}>
                       {t('singleCourse.reviewTitle')}
                     </Text>
                     <TextInput
@@ -1127,7 +1155,7 @@ class CoursesDetails extends Component {
                         color: '#000',
                       }}
                       onChangeText={value =>
-                        this.setState({titleRating: value})
+                        this.setState({ titleRating: value })
                       }
                     />
                   </View>
@@ -1137,7 +1165,7 @@ class CoursesDetails extends Component {
                       alignItems: 'flex-start',
                       marginLeft: 8,
                     }}>
-                    <Text style={{marginBottom: 10}}>
+                    <Text style={{ marginBottom: 10 }}>
                       {t('singleCourse.reviewRating')}
                     </Text>
                     <Rating
@@ -1147,12 +1175,12 @@ class CoursesDetails extends Component {
                       startingValue={5}
                       ratingColor="#FBC815"
                       onFinishRating={value =>
-                        this.setState({starRating: value})
+                        this.setState({ starRating: value })
                       }
                     />
                   </View>
                 </View>
-                <Text style={{marginBottom: 10, marginTop: 16}}>
+                <Text style={{ marginBottom: 10, marginTop: 16 }}>
                   {t('singleCourse.reviewContent')}
                 </Text>
                 <TextInput
@@ -1169,7 +1197,7 @@ class CoursesDetails extends Component {
                   multiline
                   numberOfLines={4}
                   textAlignVertical="top"
-                  onChangeText={value => this.setState({contentRating: value})}
+                  onChangeText={value => this.setState({ contentRating: value })}
                 />
                 <TouchableOpacity
                   style={{
@@ -1205,21 +1233,34 @@ class CoursesDetails extends Component {
               <>
                 <Text style={styles.txtTotal}>
                   {t('singleCourse.average')}{' '}
-                  <Text style={{fontWeight: '500'}}>
+                  <Text style={{ fontWeight: '500' }}>
                     {data.course_data.result.result} %
                   </Text>
                 </Text>
-                <TouchableOpacity
-                  style={styles.btnAddToCart}
-                  onPress={this.onStart}>
-                  <Text style={styles.txtAddToCart}>
-                    {t('singleCourse.btnContinue')}
-                  </Text>
-                  <IconI
-                    name="arrow-forward-outline"
-                    style={{color: '#fff', fontSize: 20, marginLeft: 16}}
-                  />
-                </TouchableOpacity>
+               
+                {this.state.restrict === 'Public' ? (
+                  <TouchableOpacity
+                    style={styles.btnAddToCart}
+                    onPress={() => Linking.openURL('https://safetytxt.com/contact/')}>
+                    <Text style={styles.txtAddToCart}>Contact Support</Text>
+                    <IconI
+                      name="open-outline"
+                      style={{ color: '#fff', fontSize: 20, marginLeft: 16 }}
+                    />
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.btnAddToCart}
+                    onPress={this.onStart}>
+                    <Text style={styles.txtAddToCart}>Continue</Text>
+                    <IconI
+                      name="arrow-forward-outline"
+                      style={{ color: '#fff', fontSize: 20, marginLeft: 16 }}
+                    />
+                  </TouchableOpacity>
+                )}
+
+
               </>
             ) : data?.course_data.status === 'purchased' ? (
               <TouchableOpacity
@@ -1242,7 +1283,7 @@ class CoursesDetails extends Component {
                   style={styles.btnAddToCart}
                   onPress={() => this.addToCard(String(data.id))}>
                   <Text style={styles.txtAddToCart}>
-                  (ID: {data.id})
+                    (ID: {data.id})
                     {t('singleCourse.btnAddToCart')}
                   </Text>
                 </TouchableOpacity>
@@ -1334,13 +1375,13 @@ class CoursesDetails extends Component {
     );
   }
 }
-const mapStateToProps = ({course, wishlist, user, productIAP}) => ({
+const mapStateToProps = ({ course, wishlist, user, productIAP }) => ({
   course,
   wishlist,
   user,
   productIAP,
 });
-const mapDispatchToProps = dispatch => ({dispatch});
+const mapDispatchToProps = dispatch => ({ dispatch });
 
 export default connect(
   mapStateToProps,

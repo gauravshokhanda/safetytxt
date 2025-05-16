@@ -22,6 +22,9 @@ import styles from './styles';
 import SkeletonFlatList from '../../component/common/skeleton/flatlist';
 import SkeletonCategory from '../../component/common/skeleton/category';
 import { Linking } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+
+
 
 
 class Home extends PureComponent {
@@ -74,10 +77,10 @@ class Home extends PureComponent {
         });
       });
     }
-    Client.topCoursesWithStudent(!!user?.token).then(response => {
+    Client.Newcourse(!!user?.token).then(response => {
       this.setState({
         topCourseWithStudent: response,
-        loading2: false,
+        loading2: true,
       });
     });
 
@@ -245,9 +248,9 @@ class Home extends PureComponent {
                             styles.progress,
                             {
                               width: `${(dataOverview.course_data?.result?.items?.lesson
-                                  ?.completed /
-                                  dataOverview.course_data?.result?.items
-                                    ?.lesson?.total) *
+                                ?.completed /
+                                dataOverview.course_data?.result?.items
+                                  ?.lesson?.total) *
                                 100
                                 }%`,
                               backgroundColor: '#FFD336',
@@ -267,9 +270,9 @@ class Home extends PureComponent {
                             styles.progress,
                             {
                               width: `${(dataOverview.course_data?.result?.items?.quiz
-                                  ?.completed /
-                                  dataOverview.course_data?.result?.items?.quiz
-                                    ?.total) *
+                                ?.completed /
+                                dataOverview.course_data?.result?.items?.quiz
+                                  ?.total) *
                                 100
                                 }%`,
                               backgroundColor: '#41DBD2',
@@ -295,9 +298,9 @@ class Home extends PureComponent {
                                 styles.progress,
                                 {
                                   width: `${(dataOverview.course_data?.result?.items
-                                      ?.assignment?.completed /
-                                      dataOverview.course_data?.result?.items
-                                        ?.assignment?.total) *
+                                    ?.assignment?.completed /
+                                    dataOverview.course_data?.result?.items
+                                      ?.assignment?.total) *
                                     100
                                     }%`,
                                   backgroundColor: '#958CFF',
@@ -366,7 +369,7 @@ class Home extends PureComponent {
                 Revolutionizing Safety, Compliance, and Workforce Solutions
               </Text>
               <TouchableOpacity
-                onPress={() => Linking.openURL('https://SafetyTXT.com')}
+                onPress={() => Linking.openURL('https://safetytxt.com/contact/')}
 
                 style={{
                   backgroundColor: '#008CFF',
@@ -375,33 +378,60 @@ class Home extends PureComponent {
                   borderRadius: 30,
                   marginVertical: 10,
                 }}>
-                <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                <Text style={{ color: '#fff', fontWeight: 'bold' }}>
                   CONTACT US!
                 </Text>
               </TouchableOpacity>
               <View
   style={{
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     width: '100%',
     marginTop: 10,
-  }}>
-  <Text
+  }}
+>
+  {/* 🌐 Open Website */}
+  <TouchableOpacity
+    onPress={() => Linking.openURL('https://safetytxt.com')}
     style={{
-      color: '#3B73D1',
-      fontWeight: 'bold',
-      fontSize: 16,
-    }}>
-    SafetyTXT.com
-  </Text>
-  <Text
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: 'white',
+      borderRadius: 30,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      elevation: 3,
+    }}
+  >
+    <Icon name="globe-outline" size={20} color="#0EA5E9" style={{ marginRight: 8 }} />
+                  <Text
+                    style={{fontSize: 12, color: '#0EA5E9', fontWeight: '600'}}>
+      SafetyTXT.com
+    </Text>
+  </TouchableOpacity>
+
+  {/* 📞 Call Phone Number */}
+  <TouchableOpacity
+    onPress={() => Linking.openURL('tel:+18003423023')}
     style={{
-      fontSize: 16,
-      fontWeight: 'bold',
-    }}>
-    (800)342-3023
-  </Text>
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: 'white',
+      borderRadius: 30,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      elevation: 3,
+    }}
+  >
+    <Icon name="call-outline" size={20} color="#10B981" style={{ marginRight: 8 }} />
+    <Text style={{ fontSize: 12, color: '#10B981', fontWeight: '600' }}>
+      +1 8003423023
+    </Text>
+  </TouchableOpacity>
 </View>
+
+
+
 
             </View>
 
@@ -419,7 +449,8 @@ class Home extends PureComponent {
 
           {topCourseWithStudent && topCourseWithStudent.length > 0 && (
             <View style={styles.viewList}>
-              <Text style={styles.titleList}>{t('home.popular')}</Text>
+              {/* <Text style={styles.titleList}>{t('home.popular')}</Text> */}
+              <Text style={styles.titleList}>Preview Courses</Text>
               <PopularCourses
                 navigation={navigation}
                 contentContainerStyle={{ paddingHorizontal: 16 }}
@@ -428,12 +459,12 @@ class Home extends PureComponent {
               />
             </View>
           )}
-          {loading2 && (
+          {/* {loading2 && (
             <View style={styles.viewList}>
               <Text style={styles.titleList}>{t('home.popular')}</Text>
               <SkeletonFlatList />
             </View>
-          )}
+          )} */}
           {/* {dataNewCourse && dataNewCourse.length > 0 && (
             <View style={styles.viewList}>
               <Text style={styles.titleList}>{t('home.new')}</Text>

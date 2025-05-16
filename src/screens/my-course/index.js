@@ -11,6 +11,7 @@ import {
   Dimensions,
   TextInput,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {withTranslation} from 'react-i18next';
 import {connect} from 'react-redux';
@@ -97,6 +98,7 @@ class MyCourse extends Component {
   };
 
   async getData() {
+   
     const {filter, keySearch, page} = this.state;
     const param = {
       page,
@@ -105,6 +107,11 @@ class MyCourse extends Component {
       optimize:
         'sections,on_sale,can_finish,can_retake,ratake_count,rataken,rating,price,origin_price,sale_price,tags,count_students,instructor,meta_data',
     };
+    const {user} = this.props;
+    const param2 = {
+      user_id: user?.info?.id
+    };
+
     if (keySearch) {
       param.search = keySearch;
     }
@@ -112,10 +119,11 @@ class MyCourse extends Component {
       param.course_filter = filter;
     }
 
-    const response = await Client.course(param);
-    console.log(param, 'params ');
+    const response = await Client.Newcourse2(param2);
+    console.log(param2, 'params2 ');
 
     console.log(response, 'response of  my courses ');
+
 
     this.setState({
       data: page !== 1 ? this.state.data.concat(response) : response,
