@@ -50,7 +50,7 @@ class CoursesDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeSections: [0],
+      activeSections: [],
       review: null,
       reviewMessage: '',
       isWishlist: false,

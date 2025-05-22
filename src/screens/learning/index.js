@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   Text,
   View,
@@ -14,20 +14,20 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
-import {withTranslation} from 'react-i18next';
-import {Client} from 'app-api';
-import {Images} from 'app-assets';
+import { withTranslation } from 'react-i18next';
+import { Client } from 'app-api';
+import { Images } from 'app-assets';
 import IconI from 'react-native-vector-icons/Ionicons';
 import IconF from 'react-native-vector-icons/Feather';
 import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import Modal from 'react-native-modal';
-import {tronLog} from 'app-common';
+import { tronLog } from 'app-common';
 import Accordion from 'react-native-collapsible/Accordion';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import DraggableFlatList from 'react-native-draggable-flatlist';
-import {Assignment, ProgressCircle, RenderDataHTML} from 'app-component';
+import { Assignment, ProgressCircle, RenderDataHTML } from 'app-component';
 import styles from './styles';
-import {showLoading} from '../../actions/common';
+import { showLoading } from '../../actions/common';
 import CountDown from '../../component/common/countdown';
 import ReviewQuiz from '../../component/item-detail/review-quiz';
 
@@ -46,6 +46,7 @@ class Learning extends Component {
       itemQuestion: null,
       isAssignment: false,
       isShowReview: false,
+      accordionKey: 0,
     };
     this.item = null;
     this.id = null;
@@ -58,8 +59,8 @@ class Learning extends Component {
   }
 
   async componentDidMount() {
-    const {route} = this.props;
-    const {item, index, idCourse} = route.params;
+    const { route } = this.props;
+    const { item, index, idCourse } = route.params;
     await this.getLesson(item);
     this.item = item;
     this.idCourse = idCourse;
@@ -90,9 +91,10 @@ class Learning extends Component {
       dataQuiz: null,
       itemQuestion: null,
       isAssignment: false,
+      forceRenderAccordion: false,
     });
     const response = await Client.quiz(this.item.id);
-    console.log(response,"quiz response")
+    console.log(response, "quiz response")
     this.setState({
       data: response,
       isLesson: false,
@@ -106,7 +108,7 @@ class Learning extends Component {
   };
 
   get dataLesson() {
-    const {course} = this.props;
+    const { course } = this.props;
     let dataTemp = [];
     course.data.sections.forEach(obj => {
       dataTemp = [...dataTemp, ...obj.items];
@@ -124,19 +126,19 @@ class Learning extends Component {
   }
 
   handleBackPress = () => {
-    const {navigation} = this.props;
+    const { navigation } = this.props;
     navigation.goBack(null);
     return true;
   };
 
   goBack = () => {
-    const {navigation} = this.props;
+    const { navigation } = this.props;
     navigation.goBack();
   };
 
   onReloadDataRetake = async data => {
     tronLog('data1111', data);
-    await this.setState({isStartQuiz: false});
+    await this.setState({ isStartQuiz: false });
     await this.getLesson(this.item);
     this.setState({
       isStartQuiz: true,
@@ -147,7 +149,7 @@ class Learning extends Component {
   };
 
   getLesson = async item => {
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     // if (this.id === item.id) return;
     dispatch(showLoading(true));
     if (item.type === 'lp_lesson') {
@@ -188,11 +190,23 @@ class Learning extends Component {
   };
 
   openMenu = () => {
-    this.setState({isShowMenu: true});
+    const { course } = this.props;
+    this.setState({ isShowMenu: true, activeSections: [] }, () => {
+      setTimeout(() => {
+        // Delay ensures modal is fully mounted before expanding
+        if (course?.data?.sections?.length > 0) {
+          this.setState({
+            activeSections: [0], // expand just first section or all if needed
+          });
+        }
+      }, 500); // Slightly longer delay
+    });
   };
 
+
+
   selectQuestion(item) {
-    const {itemQuestion} = this.state;
+    const { itemQuestion } = this.state;
 
     if (itemQuestion.type === 'single_choice') {
       itemQuestion.answer = [item];
@@ -222,7 +236,7 @@ class Learning extends Component {
   }
 
   onCompleteLesson = async () => {
-    const {t, dispatch} = this.props;
+    const { t, dispatch } = this.props;
     const param = {
       id: this.id,
     };
@@ -252,7 +266,7 @@ class Learning extends Component {
   renderHeaderSession = (section, index, isActive) => {
     return (
       <View key={String(index)}>
-        <View style={[styles.subTitle, {marginTop: 8, marginBottom: 11}]}>
+        <View style={[styles.subTitle, { marginTop: 8, marginBottom: 11 }]}>
           <View style={styles.subTitle}>
             <IconI name={isActive ? 'caret-up' : 'caret-down'} size={15} />
             <Text numberOfLines={1} style={styles.txtSubTitle}>
@@ -266,17 +280,17 @@ class Learning extends Component {
   };
 
   async onNavigateLearning(item) {
-    this.setState({isShowMenu: false});
+    this.setState({ isShowMenu: false });
     this.item = item;
     await this.getLesson(item);
 
-    this.scrollView.scrollTo({y: 0, animated: true});
+    this.scrollView.scrollTo({ y: 0, animated: true });
   }
 
   renderContent = section => {
-    const {course} = this.props;
+    const { course } = this.props;
 
-    const {items} = section;
+    const { items } = section;
 
 
     return (
@@ -285,7 +299,7 @@ class Learning extends Component {
           <TouchableOpacity
             key={String(i)}
             onPress={() => this.onNavigateLearning(item)}
-            style={[styles.subTitle, {marginBottom: 5, marginLeft: 24}]}
+            style={[styles.subTitle, { marginBottom: 5, marginLeft: 24 }]}
             disabled={item.locked ? true : false}>
             <View style={styles.subTitle}>
               {item.type === 'lp_lesson' && (
@@ -314,7 +328,7 @@ class Learning extends Component {
             ) : item.status === 'failed' ? (
               <IconI name="close-circle" color="#FF0000" size={16} />
             ) : (
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 {item.preview && (
                   <IconI name="eye-outline" style={styles.iconPreview} />
                 )}
@@ -332,8 +346,8 @@ class Learning extends Component {
     );
   };
 
-  renderHeaderItem = ({item, index}) => {
-    const {pageActive} = this.state;
+  renderHeaderItem = ({ item, index }) => {
+    const { pageActive } = this.state;
     // if (index > 5 && pageActive < 5)
     //   return <Text style={{ marginLeft: 3, marginTop: 3 }}>...</Text>;
     return (
@@ -368,8 +382,8 @@ class Learning extends Component {
   };
 
   onStartQuiz = async () => {
-    const {dispatch, t} = this.props;
-    const {dataQuiz} = this.state;
+    const { dispatch, t } = this.props;
+    const { dataQuiz } = this.state;
 
     dispatch(showLoading(true));
 
@@ -378,7 +392,7 @@ class Learning extends Component {
     };
 
     // Check if question is empty
-    console.log(dataQuiz?.questions?.length,"hello")
+    console.log(dataQuiz?.questions?.length, "hello")
     if (dataQuiz?.questions?.length === 0) {
       Alert.alert('', t('learningScreen.quiz.noQuestion'));
       dispatch(showLoading(false));
@@ -388,6 +402,7 @@ class Learning extends Component {
     console.log('˝ Quiz... Sending request to API');
 
     const response = await Client.quizStart(param);
+    console.log(response, 'quiz start');
     if (response?.status === 'success') {
       this.itemCheck = [];
       this.setState({
@@ -406,7 +421,7 @@ class Learning extends Component {
   };
 
   onPrevQuiz = () => {
-    const {pageActive, dataQuiz} = this.state;
+    const { pageActive, dataQuiz } = this.state;
     this.flatListRef.scrollToIndex({
       index: pageActive - 1,
       animated: true,
@@ -418,8 +433,8 @@ class Learning extends Component {
   };
 
   onNextQuiz = () => {
-    const {t} = this.props;
-    const {pageActive, dataQuiz} = this.state;
+    const { t } = this.props;
+    const { pageActive, dataQuiz } = this.state;
     if (dataQuiz.questions.length === pageActive + 1) {
       Alert.alert('', t('learningScreen.quiz.nextQuestion'));
       return;
@@ -435,8 +450,8 @@ class Learning extends Component {
   };
 
   onFinish = async () => {
-    const {dispatch, route} = this.props;
-    const {dataQuiz} = this.state;
+    const { dispatch, route } = this.props;
+    const { dataQuiz } = this.state;
     dispatch(showLoading(true));
     const itemTemp = new Object();
     tronLog('dataQuiz.questions', dataQuiz.questions);
@@ -478,20 +493,20 @@ class Learning extends Component {
   };
 
   onFinishCourse = async () => {
-    const {t} = this.props;
+    const { t } = this.props;
     Alert.alert(
       t('learningScreen.finishCourseAlert.title'),
       t('learningScreen.finishCourseAlert.description'),
       [
         {
           text: t('learningScreen.finishCourseAlert.cancel'),
-          onPress: () => {},
+          onPress: () => { },
           style: 'cancel',
         },
         {
           text: t('learningScreen.finishCourseAlert.ok'),
           onPress: async () => {
-            const {dispatch, navigation} = this.props;
+            const { dispatch, navigation } = this.props;
             dispatch(showLoading(true));
             const param = {
               id: this.idCourse,
@@ -511,13 +526,13 @@ class Learning extends Component {
           },
         },
       ],
-      {cancelable: false},
+      { cancelable: false },
     );
   };
 
   showHint = () => {
-    const {t} = this.props;
-    const {itemQuestion} = this.state;
+    const { t } = this.props;
+    const { itemQuestion } = this.state;
     tronLog('itemQuestion', itemQuestion);
     if (itemQuestion?.hint) {
       Alert.alert(t('learningScreen.quiz.hint'), itemQuestion.hint);
@@ -527,11 +542,11 @@ class Learning extends Component {
   };
 
   renderFillInBlanks = () => {
-    const {itemQuestion, dataQuiz} = this.state;
+    const { itemQuestion, dataQuiz } = this.state;
     const lstIdKeys = [];
-    const {ids, title_api} = itemQuestion.options[0];
+    const { ids, title_api } = itemQuestion.options[0];
     ids.forEach(id => {
-      lstIdKeys.push({id, key: `{{FIB_${id}}}`});
+      lstIdKeys.push({ id, key: `{{FIB_${id}}}` });
     });
     const item = itemQuestion.options[0];
 
@@ -604,7 +619,7 @@ class Learning extends Component {
   };
 
   onChangeFillBlank = (id, value) => {
-    const {itemQuestion} = this.state;
+    const { itemQuestion } = this.state;
     if (itemQuestion.answer !== undefined) {
       if (itemQuestion?.answer[id] === value) {
         itemQuestion.answer[id] = value;
@@ -622,8 +637,8 @@ class Learning extends Component {
   };
 
   onCheck = async () => {
-    const {t, dispatch} = this.props;
-    const {itemQuestion} = this.state;
+    const { t, dispatch } = this.props;
+    const { itemQuestion } = this.state;
 
     if (!itemQuestion?.answer && itemQuestion.type !== 'sorting_choice') {
       Alert.alert('', t('learningScreen.quiz.checkAlert'));
@@ -662,9 +677,9 @@ class Learning extends Component {
       explanation: response?.explanation || null,
     };
     if (response?.options) {
-      const newItemQuestion = {...itemQuestion};
+      const newItemQuestion = { ...itemQuestion };
       newItemQuestion.options = response.options;
-      this.setState({itemQuestion: newItemQuestion});
+      this.setState({ itemQuestion: newItemQuestion });
     }
     this.itemCheck.push(dataTemp);
     this.forceUpdate();
@@ -672,7 +687,7 @@ class Learning extends Component {
   };
 
   isDisable = (itemCheck, itemQuestion) => {
-    const {dataQuiz} = this.state;
+    const { dataQuiz } = this.state;
 
     if (
       itemCheck.find(x => x.id === itemQuestion.id) ||
@@ -685,7 +700,7 @@ class Learning extends Component {
   };
 
   render() {
-    const {t, course, navigation} = this.props;
+    const { t, course, navigation } = this.props;
 
     const {
       isShowMenu,
@@ -699,7 +714,7 @@ class Learning extends Component {
       pageActive,
       isAssignment,
     } = this.state;
-    
+
 
     return (
       <View style={styles.container}>
@@ -708,20 +723,20 @@ class Learning extends Component {
           <View style={styles.header1}>
             <TouchableOpacity
               onPress={this.openMenu}
-              hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
               <Image source={Images.iconMenu} style={styles.iconMenu} />
             </TouchableOpacity>
             <Text style={styles.childTitle} />
             <TouchableOpacity
               onPress={this.goBack}
-              hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
               <Image source={Images.iconClose} style={styles.iconBack} />
             </TouchableOpacity>
           </View>
         </View>
 
         <KeyboardAvoidingView
-          style={{flex: 1}}
+          style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           <ScrollView
             ref={refs => {
@@ -729,7 +744,7 @@ class Learning extends Component {
             }}
             scrollEnabled={this.state.scrollenabled}
             style={styles.content}
-            contentContainerStyle={{paddingBottom: 50}}
+            contentContainerStyle={{ paddingBottom: 50 }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             bounces={false}
@@ -742,7 +757,7 @@ class Learning extends Component {
                 justifyContent: 'space-between',
               }}>
               {isLesson && (
-                <View style={{flex: 1}}>
+                <View style={{ flex: 1 }}>
                   {data?.duration !== '' && data?.duration > 0 && (
                     <View
                       style={{
@@ -759,7 +774,7 @@ class Learning extends Component {
                   <RenderDataHTML html={data?.video_intro || ''} />
                   <RenderDataHTML
                     html={data?.content || ''}
-                    style={{fontSize: 14}}
+                    style={{ fontSize: 14 }}
                   />
                   <View
                     style={{
@@ -772,14 +787,14 @@ class Learning extends Component {
                         {course?.data?.sections[0]?.items.find(
                           x => x.id === data.id,
                         )?.status !== 'completed' && (
-                          <TouchableOpacity
-                            style={styles.btnFinish}
-                            onPress={this.onCompleteLesson}>
-                            <Text style={styles.txtFinish}>
-                              {t('learningScreen.lesson.btnComplete')}
-                            </Text>
-                          </TouchableOpacity>
-                        )}
+                            <TouchableOpacity
+                              style={styles.btnFinish}
+                              onPress={this.onCompleteLesson}>
+                              <Text style={styles.txtFinish}>
+                                {t('learningScreen.lesson.btnComplete')}
+                              </Text>
+                            </TouchableOpacity>
+                          )}
                       </>
                     )}
 
@@ -804,12 +819,12 @@ class Learning extends Component {
                       alignItems: 'center',
                     }}>
                     <IconF name="clock" size={14} />
-                    <Text style={[styles.txtTime, {marginLeft: 4}]}>
+                    <Text style={[styles.txtTime, { marginLeft: 4 }]}>
                       {data?.duration}
                     </Text>
                   </View>
 
-                  <Text style={[styles.title, {marginVertical: 10}]}>
+                  <Text style={[styles.title, { marginVertical: 10 }]}>
                     {data?.name}
                   </Text>
                   <Text style={styles.txtLession}>
@@ -825,7 +840,7 @@ class Learning extends Component {
                   <RenderDataHTML html={data?.content || ''} />
 
                   <TouchableOpacity
-                    style={[styles.btnFinish, {marginTop: 10}]}
+                    style={[styles.btnFinish, { marginTop: 10 }]}
                     onPress={this.onStartQuiz}>
                     <Text style={styles.txtFinish}>
                       {t('learningScreen.quiz.btnStart')}
@@ -851,7 +866,7 @@ class Learning extends Component {
                         }
                         textStyle={styles.txtCircle}
                       />
-                      <View style={{marginLeft: 24}}>
+                      <View style={{ marginLeft: 24 }}>
                         <Text style={styles.txtLable}>
                           {t('learningScreen.quiz.result.title')}
                         </Text>
@@ -867,7 +882,7 @@ class Learning extends Component {
                       </View>
                     </View>
                   </View>
-                  <View style={{marginTop: 25}}>
+                  <View style={{ marginTop: 25 }}>
                     {data?.results?.results?.graduation === 'failed' && (
                       <Text style={styles.txt3}>
                         {t('learningScreen.quiz.result.failed', {
@@ -929,33 +944,46 @@ class Learning extends Component {
                   <View style={styles.viewBottom}>
                     {(data?.results?.retake_count == -1 ||
                       data?.results?.retake_count - data.results.retaken >
-                        0) && (
-                      <TouchableOpacity
-                        style={styles.btnRetoke}
-                        onPress={() => this.onStartQuiz()}>
-                        <Text style={styles.txtRetoke}>
-                          {t('learningScreen.quiz.result.btnRetake', {
-                            count:
-                              data?.results?.retake_count == -1
-                                ? t(
+                      0) && (
+                        <TouchableOpacity
+                          style={styles.btnRetoke}
+                          onPress={() => this.onStartQuiz()}>
+                          <Text style={styles.txtRetoke}>
+                            {t('learningScreen.quiz.result.btnRetake', {
+                              count:
+                                data?.results?.retake_count == -1
+                                  ? t(
                                     'learningScreen.quiz.result.btnRetakeUnlimited',
                                   )
-                                : data?.results?.retake_count -
+                                  : data?.results?.retake_count -
                                   data.results.retaken,
-                          })}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
+                            })}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
                     <TouchableOpacity
                       style={styles.btnReview}
                       onPress={() => {
-                        this.setState({isShowReview: true});
+                        this.setState({ isShowReview: true });
                       }}>
                       <Text style={styles.txtReview}>
                         {t('learningScreen.quiz.result.btnReview')}
                       </Text>
                     </TouchableOpacity>
+                
                   </View>
+                  <TouchableOpacity
+                      style={{
+                        backgroundColor: '#2196F3',
+                        paddingVertical: 12,
+                        borderRadius: 8,
+                        marginTop: 12,
+                        alignItems: 'center',
+                      }}
+                      onPress={this.onNext}
+                    >
+                      <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>Next</Text>
+                    </TouchableOpacity>
                 </View>
               )}
             </View>
@@ -967,7 +995,7 @@ class Learning extends Component {
               />
             )}
             {isStartQuiz && isQuiz && (
-              <View style={{marginTop: 20}}>
+              <View style={{ marginTop: 20 }}>
                 <View
                   style={{
                     flexDirection: 'row',
@@ -975,46 +1003,47 @@ class Learning extends Component {
                   }}>
                   <Text
                     numberOfLines={1}
-                    style={[styles.title, {flex: 1, paddingRight: 10}]}>
+                    style={[styles.title, { flex: 1, paddingRight: 10 }]}>
                     {data?.name}
+                    {/* { dataQuiz?.total_time} */}
                   </Text>
                   <View
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
                     }}>
-                 {dataQuiz?.total_time > 0 ? (
-  <>
-    <CountDown
-      duration={dataQuiz.total_time}
-      callBack={this.callBackFinishQuiz}
-      textStyle={{
-        color: 'red',
-        fontSize: 12,
-        fontFamily: 'Poppins-Medium',
-      }}
-    />
-    <Text
-      numberOfLines={1}
-      style={{
-        color: 'red',
-        fontFamily: 'Poppins',
-        fontSize: 12,
-      }}>
-      {t('learningScreen.quiz.timeRemaining')}
-    </Text>
-  </>
-) : (
-  <Text
-    numberOfLines={1}
-    style={{
-      color: 'green',
-      fontFamily: 'Poppins',
-      fontSize: 12,
-    }}>
-    Unlimted{/* Add this key to your translation */}
-  </Text>
-)}
+                    {dataQuiz?.total_time > 0 ? (
+                      <>
+                        <CountDown
+                          duration={dataQuiz.total_time}
+                          callBack={this.callBackFinishQuiz}
+                          textStyle={{
+                            color: 'red',
+                            fontSize: 12,
+                            fontFamily: 'Poppins-Medium',
+                          }}
+                        />
+                        <Text
+                          numberOfLines={1}
+                          style={{
+                            color: 'red',
+                            fontFamily: 'Poppins',
+                            fontSize: 12,
+                          }}>
+                          {t('learningScreen.quiz.timeRemaining')}
+                        </Text>
+                      </>
+                    ) : (
+                      <Text
+                        numberOfLines={1}
+                        style={{
+                          color: 'green',
+                          fontFamily: 'Poppins',
+                          fontSize: 12,
+                        }}>
+                        Unlimted
+                      </Text>
+                    )}
 
                   </View>
                 </View>
@@ -1036,8 +1065,8 @@ class Learning extends Component {
                       contentContainerStyle={styles.flatPageContainer}
                       showsHorizontalScrollIndicator={false}
                       keyExtractor={(item, index) => String(index)}
-                      renderItem={({item, index}) =>
-                        this.renderHeaderItem({item, index})
+                      renderItem={({ item, index }) =>
+                        this.renderHeaderItem({ item, index })
                       }
                     />
                     <TouchableOpacity
@@ -1070,9 +1099,9 @@ class Learning extends Component {
                           <IconI
                             name={
                               itemQuestion?.answer &&
-                              itemQuestion.answer.find(
-                                x => x.value === item.value,
-                              )
+                                itemQuestion.answer.find(
+                                  x => x.value === item.value,
+                                )
                                 ? 'radio-button-on'
                                 : 'radio-button-off'
                             }
@@ -1097,7 +1126,7 @@ class Learning extends Component {
                           <IconI
                             name={
                               itemQuestion?.answer &&
-                              itemQuestion.answer.value === item.value
+                                itemQuestion.answer.value === item.value
                                 ? 'radio-button-on'
                                 : 'radio-button-off'
                             }
@@ -1123,9 +1152,9 @@ class Learning extends Component {
                           <IconI
                             name={
                               itemQuestion?.answer &&
-                              itemQuestion.answer.find(
-                                x => x.value === item.value,
-                              )
+                                itemQuestion.answer.find(
+                                  x => x.value === item.value,
+                                )
                                 ? 'checkbox-outline'
                                 : 'square-outline'
                             }
@@ -1140,18 +1169,18 @@ class Learning extends Component {
                     {itemQuestion.type === 'sorting_choice' && (
                       <DraggableFlatList
                         onDragBegin={() => {
-                          this.setState({scrollenabled: false});
+                          this.setState({ scrollenabled: false });
                         }}
                         onRelease={() => {
-                          this.setState({scrollenabled: true});
+                          this.setState({ scrollenabled: true });
                         }}
-                        onDragEnd={({data}) => {
+                        onDragEnd={({ data }) => {
                           itemQuestion.options = data;
                           this.forceUpdate();
                         }}
                         keyExtractor={item => `draggable-item-${item.value}`}
                         data={itemQuestion.options}
-                        renderItem={({item, drag, isActive}) => (
+                        renderItem={({ item, drag, isActive }) => (
                           <TouchableOpacity
                             style={{
                               padding: 8,
@@ -1175,7 +1204,7 @@ class Learning extends Component {
                               name="menu"
                               size={22}
                               color="#000"
-                              style={{marginRight: 10}}
+                              style={{ marginRight: 10 }}
                             />
                             <Text style={styles.txtItemQuestion}>
                               {item.title}
@@ -1185,7 +1214,7 @@ class Learning extends Component {
                       />
                     )}
                     {itemQuestion.type === 'fill_in_blanks' && (
-                      <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                         {this.renderFillInBlanks()}
                       </View>
                     )}
@@ -1208,7 +1237,7 @@ class Learning extends Component {
                           alignSelf: 'flex-start',
                           borderRadius: 4,
                         }}>
-                        <Text style={{color: '#fff'}}>
+                        <Text style={{ color: '#fff' }}>
                           {t('learningScreen.quiz.correct')}
                         </Text>
                       </View>
@@ -1221,7 +1250,7 @@ class Learning extends Component {
                           alignSelf: 'flex-start',
                           borderRadius: 4,
                         }}>
-                        <Text style={{color: '#fff'}}>
+                        <Text style={{ color: '#fff' }}>
                           {t('learningScreen.quiz.inCorrect')}
                         </Text>
                       </View>
@@ -1242,37 +1271,37 @@ class Learning extends Component {
                     </View>
                     {this.itemCheck.find(x => x.id === itemQuestion.id)
                       ?.explanation && (
-                      <TouchableOpacity
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginLeft: 16,
-                          padding: 0,
-                          alignSelf: 'flex-start',
-                          borderBottomWidth: 2,
-                          borderBottomColor: '#b334af',
-                        }}
-                        onPress={() =>
-                          Alert.alert(
-                            'Explanation',
-                            this.itemCheck.find(x => x.id === itemQuestion.id)
-                              .explanation,
-                          )
-                        }>
-                        <IconF name="navigation" color="#b334af" size={14} />
-                        <Text
+                        <TouchableOpacity
                           style={{
-                            color: '#b334af',
-                            marginLeft: 5,
-                            fontFamily: 'Poppins-Medium',
-                          }}>
-                          {t('learningScreen.quiz.explanation')}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginLeft: 16,
+                            padding: 0,
+                            alignSelf: 'flex-start',
+                            borderBottomWidth: 2,
+                            borderBottomColor: '#b334af',
+                          }}
+                          onPress={() =>
+                            Alert.alert(
+                              'Explanation',
+                              this.itemCheck.find(x => x.id === itemQuestion.id)
+                                .explanation,
+                            )
+                          }>
+                          <IconF name="navigation" color="#b334af" size={14} />
+                          <Text
+                            style={{
+                              color: '#b334af',
+                              marginLeft: 5,
+                              fontFamily: 'Poppins-Medium',
+                            }}>
+                            {t('learningScreen.quiz.explanation')}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
                   </View>
                 )}
-                <View style={{height: 36}} />
+                <View style={{ height: 36 }} />
                 {dataQuiz?.instant_check &&
                   (!dataQuiz?.checked_questions.length ||
                     !dataQuiz?.checked_questions.includes(itemQuestion.id)) && (
@@ -1289,7 +1318,7 @@ class Learning extends Component {
                         !!this.itemCheck.find(x => x.id === itemQuestion.id)
                       }
                       onPress={() => this.onCheck()}>
-                      <Text style={{color: '#fff'}}>
+                      <Text style={{ color: '#fff' }}>
                         {t('learningScreen.quiz.btnCheck')}
                       </Text>
                       <IconI name="checkmark" color="#fff" />
@@ -1306,7 +1335,7 @@ class Learning extends Component {
                         justifyContent: 'center',
                         height: 50,
                       }}>
-                      <Text style={{color: '#36CE61'}}>
+                      <Text style={{ color: '#36CE61' }}>
                         {t('learningScreen.quiz.questionAnswered')}
                       </Text>
                       <IconI name="checkmark" color="#36CE61" />
@@ -1374,24 +1403,24 @@ class Learning extends Component {
           useNativeDriver
           coverScreen
           onBackButtonPress={() => {
-            this.setState({isShowMenu: false});
+            this.setState({ isShowMenu: false });
           }}
           onBackdropPress={() => {
-            this.setState({isShowMenu: false});
+            this.setState({ isShowMenu: false });
           }}>
           <View style={styles.viewModalMenu}>
             <View style={styles.viewHeaderModalMenu}>
               <Text
-                style={[styles.title, {flex: 1, marginRight: 10}]}
+                style={[styles.title, { flex: 1, marginRight: 10 }]}
                 numberOfLines={1}>
                 {course?.data?.name || ''}
               </Text>
               <TouchableOpacity
                 style={styles.btnCloseMenu}
                 onPress={() => {
-                  this.setState({isShowMenu: false});
+                  this.setState({ isShowMenu: false });
                 }}
-                hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                 <Image source={Images.iconClose} style={styles.iconBack} />
               </TouchableOpacity>
             </View>
@@ -1401,17 +1430,20 @@ class Learning extends Component {
               removeClippedSubviews={false}>
               <View style={styles.contentMenu}>
                 {course?.data?.sections && (
+
                   <Accordion
                     sections={course?.data?.sections}
-                    underlayColor="transpation"
-                    activeSections={activeSections}
+                    underlayColor="transparent"
+                    activeSections={this.state.activeSections}
                     renderHeader={this.renderHeaderSession}
                     renderContent={this.renderContent}
-                    onChange={value => {
-                      this.setState({activeSections: value});
+                    onChange={(value) => {
+                      this.setState({ activeSections: value });
                     }}
                   />
+
                 )}
+
               </View>
             </ScrollView>
           </View>
@@ -1420,17 +1452,17 @@ class Learning extends Component {
           <ReviewQuiz
             data={data}
             isShowReview={this.state.isShowReview}
-            onClose={() => this.setState({isShowReview: false})}
+            onClose={() => this.setState({ isShowReview: false })}
           />
         )}
       </View>
     );
   }
 }
-const mapStateToProps = ({course}) => ({
+const mapStateToProps = ({ course }) => ({
   course,
 });
-const mapDispatchToProps = dispatch => ({dispatch});
+const mapDispatchToProps = dispatch => ({ dispatch });
 
 export default connect(
   mapStateToProps,

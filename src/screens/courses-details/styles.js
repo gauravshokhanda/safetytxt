@@ -354,4 +354,17 @@ export default StyleSheet.create({
     lineHeight: 21,
     color: '#000',
   },
+  btnNextLesson: {
+    backgroundColor: '#000',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    marginLeft: 10,
+  },
+  txtNextLesson: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: 'Poppins-Medium',
+  }
+  
 });
