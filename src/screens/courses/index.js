@@ -457,96 +457,60 @@ class Courses extends Component {
         {/* )} */}
 
         {isShowFilter && (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              this.setState({isShowFilter: false});
-            }}>
-            <View style={[styles.viewUpdateRole, {}]}>
-              <TouchableWithoutFeedback>
-                <View
-                  style={[
-                    styles.viewModalFilter,
-                    {right: -deviceWidth + 127 + 16, top: 150},
-                  ]}>
-                  <TouchableOpacity onPress={() => this.setFilter(0)}>
-                    <Text
-                      style={[
-                        styles.txtFilterItem,
-                        filter === 0 && {color: '#000'},
-                      ]}>
-                      {t('courses.filters.default')}
-                    </Text>
-                  </TouchableOpacity>
-                  {/* <TouchableOpacity onPress={() => this.setFilter(1)}>
-                    <Text
-                      style={[
-                        styles.txtFilterItem,
-                        filter === 1 && { color: '#000' },
-                      ]}
-                    >
-                      Price: Low to High
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.setFilter(2)}>
-                    <Text
-                      style={[
-                        styles.txtFilterItem,
-                        filter === 2 && { color: '#000' },
-                      ]}
-                    >
-                      Price: High to Low
-                    </Text>
-                  </TouchableOpacity> */}
-                  <TouchableOpacity onPress={() => this.setFilter(6)}>
-                    <Text
-                      style={[
-                        styles.txtFilterItem,
-                        filter === 6 && {color: '#000'},
-                      ]}>
-                      {t('courses.filters.title')}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.setFilter(5)}>
-                    <Text
-                      style={[
-                        styles.txtFilterItem,
-                        filter === 5 && {color: '#000'},
-                      ]}>
-                      {t('courses.filters.newest')}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.setFilter(7)}>
-                    <Text
-                      style={[
-                        styles.txtFilterItem,
-                        filter === 7 && {color: '#000'},
-                      ]}>
-                      {t('courses.filters.oldest')}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.setFilter(3)}>
-                    <Text
-                      style={[
-                        styles.txtFilterItem,
-                        filter === 3 && {color: '#000'},
-                      ]}>
-                      {t('courses.filters.sale')}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.setFilter(4)}>
-                    <Text
-                      style={[
-                        styles.txtFilterItem,
-                        filter === 4 && {color: '#000'},
-                      ]}>
-                      {t('courses.filters.popular')}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
-          </TouchableWithoutFeedback>
-        )}
+  <View
+    style={{
+      position: 'absolute',
+      top: 150,
+      right: 16,
+      zIndex: 999,
+      backgroundColor: '#fff',
+      borderRadius: 8,
+      elevation: 5,
+      padding: 10,
+    }}>
+    <TouchableOpacity onPress={() => this.setFilter(0)}>
+      <Text style={[styles.txtFilterItem, filter === 0 && {color: '#000'}]}>
+        {t('courses.filters.default')}
+      </Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => this.setFilter(1)}>
+      <Text style={[styles.txtFilterItem, filter === 1 && {color: '#000'}]}>
+        Price: Low to High
+      </Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => this.setFilter(2)}>
+      <Text style={[styles.txtFilterItem, filter === 2 && {color: '#000'}]}>
+        Price: High to Low
+      </Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => this.setFilter(6)}>
+      <Text style={[styles.txtFilterItem, filter === 6 && {color: '#000'}]}>
+        {t('courses.filters.title')}
+      </Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => this.setFilter(5)}>
+      <Text style={[styles.txtFilterItem, filter === 5 && {color: '#000'}]}>
+        {t('courses.filters.newest')}
+      </Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => this.setFilter(7)}>
+      <Text style={[styles.txtFilterItem, filter === 7 && {color: '#000'}]}>
+        {t('courses.filters.oldest')}
+      </Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => this.setFilter(3)}>
+      <Text style={[styles.txtFilterItem, filter === 3 && {color: '#000'}]}>
+        {t('courses.filters.sale')}
+      </Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => this.setFilter(4)}>
+      <Text style={[styles.txtFilterItem, filter === 4 && {color: '#000'}]}>
+        {t('courses.filters.popular')}
+      </Text>
+    </TouchableOpacity>
+  </View>
+)}
+
       </View>
     );
   }
