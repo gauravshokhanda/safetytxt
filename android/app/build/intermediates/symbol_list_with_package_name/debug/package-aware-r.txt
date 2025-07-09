@@ -3479,6 +3479,7 @@ layout ucrop_layout_scale_wheel
 layout ucrop_view
 menu ucrop_menu_activity
 mipmap ic_launcher
+mipmap ic_launcher2
 plurals mtrl_badge_content_description
 raw com_android_billingclient_heterodyne_info
 raw com_android_billingclient_registration_info

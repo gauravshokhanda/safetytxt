@@ -70,7 +70,7 @@ class PopularCoursesHorizontal extends PureComponent {
               <IconI name="heart" color="#FBC815" size={22} />
             )}
           </TouchableOpacity> */}
-          <View
+          {/* <View
             style={{
               width: 220,
               justifyContent: 'space-between',
@@ -143,7 +143,7 @@ class PopularCoursesHorizontal extends PureComponent {
                 <Text style={styles.rate}>{String(item.rating)}</Text>
               </View>
             )}
-          </View>
+          </View> */}
         </View>
         <Text numberOfLines={2} style={styles.title}>
           {item?.name}

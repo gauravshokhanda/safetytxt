@@ -3,6 +3,7 @@ local
 drawable rn_edit_text_material
 integer react_native_dev_server_port
 mipmap ic_launcher
+mipmap ic_launcher2
 string CODE_PUSH_APK_BUILD_TIME
 string CodePushDeploymentKey
 string app_name

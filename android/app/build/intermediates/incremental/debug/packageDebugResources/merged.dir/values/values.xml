@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="react_native_dev_server_port">8081</integer>
-    <string name="CODE_PUSH_APK_BUILD_TIME" translatable="false">"1743495210499"</string>
+    <string name="CODE_PUSH_APK_BUILD_TIME" translatable="false">"1750240554308"</string>
     <string moduleConfig="true" name="CodePushDeploymentKey">DeploymentKey</string>
     <string name="app_name">Safetytxt</string>
     <string name="gcm_defaultSenderId" translatable="false">950632502651</string>

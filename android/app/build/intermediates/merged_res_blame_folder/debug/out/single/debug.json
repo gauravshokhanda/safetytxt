@@ -8,6 +8,10 @@
         "source": "com.eduma.app-main-50:/mipmap-mdpi/ic_launcher.png"
     },
     {
+        "merged": "com.eduma.app-merged_res-48:/mipmap-xxxhdpi_ic_launcher2.png.flat",
+        "source": "com.eduma.app-main-50:/mipmap-xxxhdpi/ic_launcher2.png"
+    },
+    {
         "merged": "com.eduma.app-merged_res-48:/drawable_rn_edit_text_material.xml.flat",
         "source": "com.eduma.app-main-50:/drawable/rn_edit_text_material.xml"
     },

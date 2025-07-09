@@ -80,7 +80,7 @@ class ItemWishlist extends PureComponent {
           >
             <IconI name="heart-outline" color="#fff" size={22} />
           </TouchableOpacity> */}
-          <View style={styles.viewAvatar}>
+          {/* <View style={styles.viewAvatar}>
             <View>
               {item.on_sale ? (
                 <View
@@ -146,7 +146,7 @@ class ItemWishlist extends PureComponent {
                 </View>
               )}
             </View>
-          </View>
+          </View> */}
         </FastImage>
         <View style={{ padding: 15 }}>
           <Text numberOfLines={2} style={styles.title}>
