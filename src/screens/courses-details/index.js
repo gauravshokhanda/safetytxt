@@ -960,7 +960,7 @@ class CoursesDetails extends Component {
                     </View>
                   )}
               </View>
-              <View
+              {/* <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -993,7 +993,7 @@ class CoursesDetails extends Component {
                 ) : (
                   <Text style={styles.price}>{t('free')}</Text>
                 )}
-              </View>
+              </View> */}
             </View>
             {data?.content ? (
               <>
