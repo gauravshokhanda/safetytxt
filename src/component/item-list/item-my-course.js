@@ -24,7 +24,10 @@ class ItemMyCourse extends PureComponent {
         onPress={() => this.onNavigateDetail(item)}
         style={styles.container}
       >
-        <FastImage source={{ uri: item.image }} style={styles.image} />
+        {typeof item.image === 'string' && item.image.startsWith('http') ? (
+          <FastImage source={{ uri: item.image }} style={styles.image} />
+        ) : null}
+
         <View style={styles.viewContent}>
           {categories && (
             <Text numberOfLines={1} style={styles.content}>
@@ -60,8 +63,8 @@ class ItemMyCourse extends PureComponent {
                   item.course_data.graduation === 'failed'
                     ? '#FF6161'
                     : item.course_data.graduation === 'passed'
-                    ? '#56C943'
-                    : '#58C3FF',
+                      ? '#56C943'
+                      : '#58C3FF',
               }}
             />
           </View>
