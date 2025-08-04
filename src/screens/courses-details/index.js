@@ -863,6 +863,7 @@ class CoursesDetails extends Component {
           </View>
         </View>
       );
+      
     }
 
     const {
