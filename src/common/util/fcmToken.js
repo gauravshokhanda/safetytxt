@@ -8,27 +8,37 @@ export async function registerFCMToken() {
   const { user } = store.getState();
 
   try {
-    // Check user is login
+    // Check if user is logged in
     if (!user?.token) return;
 
-    // Register the device with FCM
+    // Register device for remote messages
     await messaging().registerDeviceForRemoteMessages();
 
-    // Get the token
+    // Get the current FCM token
     const token = await messaging().getToken();
 
-    // Check token in store and token device is same
+    // 🔥 Log token to console
+    console.log('🔑 FCM Token:', token);
+
+    // Check if the stored token matches the current token
     if (user?.fcmToken === token) return;
 
+    // Update redux store
     store.dispatch(setFCMToken(token));
 
-    // Save token to server
-    await Client.registerFCMToken({
+    // Prepare payload for backend
+    const payload = {
       device_token: token,
       device_type: Platform.OS === 'ios' ? 'ios' : 'android',
-    });
+    };
+
+    console.log('📦 register-device payload:', payload);
+
+    // Send token to backend
+    const response = await Client.registerFCMToken(payload);
+    console.log('✅ register-device response:', response);
   } catch (error) {
-    console.log('registerFCMTokenError', error);
+    console.log('❌ registerFCMTokenError:', error);
   }
 }
 
@@ -36,24 +46,20 @@ export async function deleteFCMToken() {
   const { user } = store.getState();
 
   try {
-    // Check user is login
-    if (!user?.token) {
-      throw new Error('User is null');
-    }
+    if (!user?.token) throw new Error('User is null');
+    if (!user?.fcmToken) throw new Error('FCMToken is null');
 
-    if (!user?.fcmToken) {
-      throw new Error('FCMToken is null');
-    }
-
-    // Delete the device with FCM
+    // Unregister from FCM
     await messaging().unregisterDeviceForRemoteMessages();
 
-    await Client.deleteFCMToken({
-      device_token: user?.fcmToken,
-    });
+    // Send delete request to backend
+    await Client.deleteFCMToken({ device_token: user?.fcmToken });
 
+    // Clear token from store
     store.dispatch(setFCMToken(null));
+
+    console.log('🗑️ FCM token deleted successfully');
   } catch (error) {
-    console.log('deleteFCMTokenError', error);
+    console.log('❌ deleteFCMTokenError:', error);
   }
 }
