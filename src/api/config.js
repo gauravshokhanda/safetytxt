@@ -25,6 +25,11 @@ const onResponse = async (request, result) => {
     const body = await result.text();
     const newBody = JSON.parse(body);
 
+    // Targeted debug: log response for courses2 requests alongside existing URL debug
+    if (request?.url?.includes('/wp-json/learnpress/v1/courses2')) {
+      console.debug('Response (courses2):', newBody);
+    }
+
     if (result.status === 401) {
       store.dispatch(saveUserToken(null));
       store.dispatch(setUser(null));
@@ -65,9 +70,12 @@ const config = {
     let url = `${SITE_URL}${endpoint}`;
 
     if (Object.keys(queryParam).length > 0) {
-      url += `?${Object.keys(queryParam)
-        .map(key => `${key}=${queryParam[key]}`)
-        .join('&')}`;
+      const keys = Object.keys(queryParam).filter(
+        key => queryParam[key] !== undefined && queryParam[key] !== null,
+      );
+      if (keys.length > 0) {
+        url += `?${keys.map(key => `${key}=${queryParam[key]}`).join('&')}`;
+      }
     }
 
     console.debug(url);
@@ -130,9 +138,12 @@ const config = {
     let url = `${SITE_URL}${endpoint}`;
 
     if (Object.keys(params).length > 0) {
-      url += `?${Object.keys(params)
-        .map(key => `${key}=${params[key]}`)
-        .join('&')}`;
+      const keys = Object.keys(params).filter(
+        key => params[key] !== undefined && params[key] !== null,
+      );
+      if (keys.length > 0) {
+        url += `?${keys.map(key => `${key}=${params[key]}`).join('&')}`;
+      }
     }
 
     const options = {
