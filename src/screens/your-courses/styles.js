@@ -25,7 +25,6 @@ export default StyleSheet.create({
     // width: deviceWidth - 32,
     flex: 1,
     height: 40,
-    backgroundColor: '#fff',
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',

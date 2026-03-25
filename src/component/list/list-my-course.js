@@ -8,6 +8,7 @@ const ListMyCourse = memo(
   forwardRef((props, ref) => {
     const [, forceUpdate] = useReducer((x) => x + 1, 0);
     const flatList = useRef();
+    const onEndReachedCalledDuringMomentum = useRef(false);
     const {
       data,
       style,
@@ -32,6 +33,8 @@ const ListMyCourse = memo(
     const onEndReached = () => {
       if (!data) return;
       if (data.length === 0) return;
+      if (onEndReachedCalledDuringMomentum.current) return;
+      onEndReachedCalledDuringMomentum.current = true;
       if (nextPage) nextPage();
     };
 
@@ -56,7 +59,7 @@ const ListMyCourse = memo(
         renderItem={renderItem}
         onEndReached={onEndReached}
         onMomentumScrollBegin={() => {
-          onEndReachedCalledDuringMomentum = false;
+          onEndReachedCalledDuringMomentum.current = false;
         }}
         keyExtractor={keyExtractor} // Performance purpose
         onEndReachedThreshold={0.5}

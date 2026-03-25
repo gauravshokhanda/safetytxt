@@ -1,18 +1,22 @@
 import React, { memo, forwardRef } from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
-import { Images } from 'app-assets';
+import { TouchableOpacity } from 'react-native';
 import styles from './styles/instructor-vertical';
 
 const InstructorVertical = memo(
   forwardRef((props, ref) => {
+    const { onPress, productId, style } = props;
+
     const onNavigateDetail = () => {
-      onPress(productId);
+      if (typeof onPress === 'function') {
+        onPress(productId);
+      }
     };
 
     return (
-      <TouchableOpacity onPress={onNavigateDetail} style={styles.container}>
-
-      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={onNavigateDetail}
+        style={[styles.container, style]}
+      />
     );
   }),
   () => true

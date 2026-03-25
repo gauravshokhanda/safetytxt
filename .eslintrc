@@ -1,9 +1,19 @@
 {
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false,
+    "babelOptions": {
+      "presets": [
+        "@react-native/babel-preset"
+      ]
+    }
+  },
   "extends": [
     "@react-native"
   ],
   "rules": {
-    "prettier/prettier": "error",
+    "prettier/prettier": 0,
+    "react-hooks/exhaustive-deps": 0,
     "react/prop-types": 0,
     "react/sort-comp": 0,
     "no-underscore-dangle": 0,

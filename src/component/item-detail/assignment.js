@@ -14,7 +14,7 @@ import {useTranslation} from 'react-i18next';
 import IconF from 'react-native-vector-icons/Feather';
 import {SITE_URL} from 'app-config';
 import {tronLog} from 'app-common';
-import DocumentPicker from 'react-native-document-picker';
+import {pick, types, isCancel} from '@react-native-documents/picker';
 import {Client} from 'app-api';
 import {RenderDataHTML} from 'app-component';
 import styles from './styles/assignment';
@@ -86,24 +86,24 @@ export default function Assignment({navigation, id, onFinishCourse}) {
 
   const onChooseFile = async () => {
     try {
-      const documents = await DocumentPicker.pick({
+      const documents = await pick({
         allowMultiSelection: true,
         copyTo: 'documentDirectory',
         type: [
-          DocumentPicker.types.allFiles,
-          DocumentPicker.types.doc,
-          DocumentPicker.types.docx,
-          DocumentPicker.types.zip,
-          DocumentPicker.types.images,
-          DocumentPicker.types.ppt,
-          DocumentPicker.types.pptx,
-          DocumentPicker.types.plainText,
+          types.allFiles,
+          types.doc,
+          types.docx,
+          types.zip,
+          types.images,
+          types.ppt,
+          types.pptx,
+          types.plainText,
         ],
       });
       tronLog('onChooseFile', documents);
       setFiles(documents);
     } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
+      if (isCancel(err)) {
         // User cancelled the picker, exit any dialogs or menus and move on
       } else {
         throw err;

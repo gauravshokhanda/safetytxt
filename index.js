@@ -1,6 +1,8 @@
 /**
  * @format
  */
+import 'react-native-gesture-handler';
+import {enableScreens} from 'react-native-screens';
 import {AppRegistry, Text, TextInput} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import notifee, {EventType} from '@notifee/react-native';
@@ -8,8 +10,10 @@ import Animated from 'react-native-reanimated';
 import App from './src';
 import {name as appName} from './app.json';
 
+enableScreens();
+
 if (__DEV__) {
-  import('./ReactotronConfig').then(() => console.log('Reactotron Configured'));
+  // import('./ReactotronConfig').then(() => console.log('Reactotron Configured'));
 }
 
 Animated.addWhitelistedNativeProps({text: true});

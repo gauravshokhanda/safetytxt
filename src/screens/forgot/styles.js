@@ -147,7 +147,6 @@ export default StyleSheet.create({
     fontFamily: 'Poppins',
     textAlign: 'center',
     fontSize: 16,
-    color: '#000',
     fontWeight: '400',
     color: '#569EC6',
   },

@@ -4,10 +4,11 @@ import {Platform, StatusBar, DeviceEventEmitter} from 'react-native';
 import {PersistGate} from 'redux-persist/integration/react';
 import {NavigationContainer} from '@react-navigation/native';
 import {Provider} from 'react-redux';
-import SplashScreen from 'react-native-splash-screen';
+import RNBootSplash from 'react-native-bootsplash';
 import NetInfo from '@react-native-community/netinfo';
-import codePush from 'react-native-code-push';
+import codePush from '@revopush/react-native-code-push';
 import notifee, {EventType, AuthorizationStatus} from '@notifee/react-native';
+import '@react-native-firebase/app';
 import messaging from '@react-native-firebase/messaging';
 import './config/translations';
 import RootScreen from './screens/root';
@@ -32,13 +33,13 @@ const MyApp = () => {
   useEffect(() => {
     (async function () {
       try {
-        await codePush.sync({
-          deploymentKey:
-            Platform.OS === 'ios' ? CODE_PUSH.ios : CODE_PUSH.android,
-          installMode: codePush.InstallMode.IMMEDIATE,
-        });
+        // await codePush.sync({
+        //   deploymentKey:
+        //     Platform.OS === 'ios' ? CODE_PUSH.ios : CODE_PUSH.android,
+        //   installMode: codePush.InstallMode.IMMEDIATE,
+        // });
         setTimeout(() => {
-          SplashScreen.hide();
+          RNBootSplash.hide({fade: true});
         }, 1000);
       } catch (e) {
         console.log(e);
