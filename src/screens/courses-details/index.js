@@ -806,7 +806,7 @@ class CoursesDetails extends Component {
     const { course, user } = this.props;
 
     const courseId = course?.data?.id; // Retrieve course_id from the course data
-    const userId = user?.info?.id; // Retrieve user_id from Redux
+    const userId = user?.info?.id ?? user?.info?.user_id; // Retrieve user_id from Redux
     console.log('test', user);
     console.log(userId, courseId, 'ids');
     if (courseId && userId) {

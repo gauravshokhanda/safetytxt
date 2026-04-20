@@ -200,18 +200,35 @@ class Home extends PureComponent {
               <TouchableOpacity
                 onPress={() => navigation.navigate('ProfileStackScreen')}
                 style={{ flexDirection: 'row' }}>
-                <Image
-                  style={styles.avatar}
-                  source={{
-                    uri:
-                      user?.info?.avatar_url ||
-                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMjCj43UJiVu-3Qp9b5yj-SwLGR-kndCzqLaiMv5SMkITd4CcbQQ7vX_CEZd-xxqka8ZM&usqp=CAU',
-                  }}
-                />
-                <View style={{ marginLeft: 15 }}>
-                  <Text style={styles.fullname}>{user?.info?.name}</Text>
-                  <Text style={styles.email}>{user?.info?.email}</Text>
-                </View>
+                {(() => {
+                  const fullNameFromParts = [user?.info?.first_name, user?.info?.last_name]
+                    .filter(Boolean)
+                    .join(' ')
+                  const displayName =
+                    fullNameFromParts ||
+                    user?.info?.name ||
+                    user?.info?.user_display_name ||
+                    user?.info?.display_name ||
+                    user?.info?.nickname ||
+                    user?.info?.user_login
+                  const displayEmail = user?.info?.email || user?.info?.user_email
+                  return (
+                    <>
+                      <Image
+                        style={styles.avatar}
+                        source={{
+                          uri:
+                            user?.info?.avatar_url ||
+                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMjCj43UJiVu-3Qp9b5yj-SwLGR-kndCzqLaiMv5SMkITd4CcbQQ7vX_CEZd-xxqka8ZM&usqp=CAU',
+                        }}
+                      />
+                      <View style={{ marginLeft: 15 }}>
+                        {!!displayName && <Text style={styles.fullname}>{displayName}</Text>}
+                        {!!displayEmail && <Text style={styles.email}>{displayEmail}</Text>}
+                      </View>
+                    </>
+                  )
+                })()}
               </TouchableOpacity>
             </View>
           )}

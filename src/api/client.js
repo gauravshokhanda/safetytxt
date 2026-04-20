@@ -25,7 +25,7 @@ const Client = {
     );
   },
   Newcourse2: (params = {}, randomVersion = true) => {
-    console.log(params);
+    console.log('Newcourse2 params:', params );
     return config.get(
       '/wp-json/learnpress/v1/courses2',
       {...params},

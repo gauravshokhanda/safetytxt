@@ -61,6 +61,10 @@ const onResponse = async (request, result) => {
 
 const config = {
   get: async (endpoint, params = {}, randomVersion = true) => {
+    const shouldLogCourses2 = endpoint?.includes('/wp-json/learnpress/v1/courses2');
+    if (shouldLogCourses2) {
+      console.log('GET courses2 params (input):', params, 'randomVersion:', randomVersion);
+    }
     const queryParam = {...params};
 
     if (randomVersion) {
@@ -79,6 +83,10 @@ const config = {
     }
 
     console.debug(url);
+    if (shouldLogCourses2) {
+      console.log('GET courses2 params (final):', queryParam);
+      console.log('GET courses2 url:', url);
+    }
 
     const options = {
       method: 'GET',

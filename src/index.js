@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, {useEffect} from 'react';
-import {Platform, StatusBar, DeviceEventEmitter} from 'react-native';
+import {Animated, DeviceEventEmitter, StatusBar, StyleSheet, Text, View} from 'react-native';
 import {PersistGate} from 'redux-persist/integration/react';
 import {NavigationContainer} from '@react-navigation/native';
 import {Provider} from 'react-redux';
@@ -29,6 +29,9 @@ export {store};
 
 const MyApp = () => {
   const [isVisible, setIsVisible] = React.useState(false);
+  const [showSplashOverlay, setShowSplashOverlay] = React.useState(true);
+  const splashOpacity = React.useRef(new Animated.Value(1)).current;
+  const splashScale = React.useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     (async function () {
@@ -40,7 +43,27 @@ const MyApp = () => {
         // });
         setTimeout(() => {
           RNBootSplash.hide({fade: true});
-        }, 1000);
+        }, 300);
+
+        Animated.parallel([
+          Animated.timing(splashScale, {
+            toValue: 1.05,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.sequence([
+            Animated.delay(450),
+            Animated.timing(splashOpacity, {
+              toValue: 0,
+              duration: 450,
+              useNativeDriver: true,
+            }),
+          ]),
+        ]).start(({finished}) => {
+          if (finished) {
+            setShowSplashOverlay(false);
+          }
+        });
       } catch (e) {
         console.log(e);
       }
@@ -145,6 +168,18 @@ const MyApp = () => {
           />
           <RootScreen />
           <NotificationModal isVisible={isVisible} />
+          {showSplashOverlay && (
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                styles.splashOverlay,
+                {opacity: splashOpacity, transform: [{scale: splashScale}]},
+              ]}>
+              <View style={styles.splashContent}>
+                <Text style={styles.splashTitle}>SafetyTxt</Text>
+              </View>
+            </Animated.View>
+          )}
         </NavigationContainer>
       </PersistGate>
     </Provider>
@@ -152,3 +187,21 @@ const MyApp = () => {
 };
 
 export default codePush(MyApp);
+
+const styles = StyleSheet.create({
+  splashOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  splashContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  splashTitle: {
+    fontSize: 36,
+    fontWeight: '700',
+    color: '#000',
+  },
+});

@@ -80,7 +80,7 @@ const GeneralSetting = ({navigation}) => {
     }
 
     dispatch(showLoading(true));
-    const response = await Client.updateUser(user?.info?.id, param);
+    const response = await Client.updateUser(user?.info?.id ?? user?.info?.user_id, param);
 
     dispatch(showLoading(false));
 

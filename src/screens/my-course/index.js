@@ -108,9 +108,22 @@ class MyCourse extends Component {
         'sections,on_sale,can_finish,can_retake,ratake_count,rataken,rating,price,origin_price,sale_price,tags,count_students,instructor,meta_data',
     };
     const { user } = this.props;
+    console.log('user on my course :', user);
+    const userId = user?.info?.id ?? user?.info?.user_id;
+    if (!user?.token || !userId) {
+      this.setState({
+        data: [],
+        loading: false,
+        showFooter: false,
+        isLoadMore: false,
+        refreshing: false,
+      });
+      return;
+    }
+
     const param2 = {
-      user_id: user?.info?.id,
-      course_filter: filter !== '' ? filter : undefined,
+      user_id: userId,
+      ...(filter !== '' ? {course_filter: filter} : {}),
     };
 
     if (keySearch) {

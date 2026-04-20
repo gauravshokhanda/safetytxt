@@ -1,6 +1,43 @@
 /* eslint-disable no-param-reassign */
 import Types from '../actions/types';
 
+const normalizeUserInfo = userInfo => {
+  if (!userInfo || typeof userInfo !== 'object') {
+    return userInfo;
+  }
+
+  const normalized = {...userInfo};
+  const userId = userInfo.id ?? userInfo.user_id;
+
+  if (userId !== undefined && userId !== null) {
+    normalized.id = userId;
+    normalized.user_id = userId;
+  }
+
+  const firstName = userInfo.first_name ?? userInfo.firstName;
+  const lastName = userInfo.last_name ?? userInfo.lastName;
+  const fullNameFromParts = [firstName, lastName].filter(Boolean).join(' ') || undefined;
+
+  const name =
+    fullNameFromParts ||
+    userInfo.name ||
+    userInfo.user_display_name ||
+    userInfo.display_name ||
+    userInfo.nickname ||
+    userInfo.user_login;
+
+  if (name !== undefined && name !== null && name !== '') {
+    normalized.name = name;
+  }
+
+  const email = userInfo.email || userInfo.user_email;
+  if (email !== undefined && email !== null && email !== '') {
+    normalized.email = email;
+  }
+
+  return normalized;
+};
+
 const INITIAL_STATE = {
   token: null,
   info: null,
@@ -21,9 +58,12 @@ const user = (state = INITIAL_STATE, action) => {
 
     case Types.SAVE_USER:
       delete action.type;
+      const normalizedUserInfo = normalizeUserInfo(action.user);
       return {
         ...state,
-        info: action.user,
+        info: normalizedUserInfo
+          ? {...(state.info || {}), ...normalizedUserInfo}
+          : normalizedUserInfo,
       };
     case Types.RECENT_SEARCH:
       delete action.type;

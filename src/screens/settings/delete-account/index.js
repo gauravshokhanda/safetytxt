@@ -40,7 +40,7 @@ const DeleteAccountSetting = ({navigation}) => {
     }
     dispatch(showLoading(true));
     const response = await Client.deleteAccount({
-      id: user?.info?.id,
+      id: user?.info?.id ?? user?.info?.user_id,
       password: deletePassword,
     });
 

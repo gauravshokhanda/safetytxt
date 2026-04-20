@@ -104,6 +104,17 @@ class Profile extends Component {
   render() {
     const {t, navigation, user} = this.props;
     tronLog('user', user);
+    const fullNameFromParts = [user?.info?.first_name, user?.info?.last_name]
+      .filter(Boolean)
+      .join(' ');
+    const displayName =
+      fullNameFromParts ||
+      user?.info?.name ||
+      user?.info?.user_display_name ||
+      user?.info?.display_name ||
+      user?.info?.nickname ||
+      user?.info?.user_login;
+    const displayEmail = user?.info?.email || user?.info?.user_email;
     return (
       <View style={styles.container}>
         <Image source={Images.bannerMyCourse} style={styles.imgBanner} />
@@ -127,16 +138,16 @@ class Profile extends Component {
                 style={styles.avatar}
               />
               <View style={{marginLeft: 15, flex: 1}}>
-                <Text style={styles.fullName}>{user?.info?.name}</Text>
+                {!!displayName && <Text style={styles.fullName}>{displayName}</Text>}
                 {user?.info?.description !== '' && (
                   <Text style={styles.txtContent}>
                     {user?.info?.description}
                   </Text>
                 )}
-                {user?.info?.email && (
+                {!!displayEmail && (
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <IconF name="mail" size={18} color="#F8C719" />
-                    <Text style={styles.txtPhone}>{user?.info?.email}</Text>
+                    <Text style={styles.txtPhone}>{displayEmail}</Text>
                   </View>
                 )}
               </View>
