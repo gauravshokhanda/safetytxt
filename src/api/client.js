@@ -1,4 +1,4 @@
-import {config} from './config';
+import {config, getApiUrl} from './config';
 
 const Client = {
   login: params => config.post('/wp-json/learnpress/v1/token', params),
@@ -38,7 +38,8 @@ const Client = {
 
   courseDetail: id => config.get(`/wp-json/learnpress/v1/courses/${id}`),
 
-  lessonWithId: id => config.get(`/wp-json/learnpress/v1/lessons/${id}`),
+  lessonWithId: (id, params = {}) =>
+    config.get(`/wp-json/learnpress/v1/lessons/${id}`, {...params}),
 
   lesson: params => config.get('/wp-json/learnpress/v1/lessons', {...params}),
 
@@ -54,7 +55,8 @@ const Client = {
   completeLesson: params =>
     config.post('/wp-json/learnpress/v1/lessons/finish', params),
 
-  quiz: id => config.get(`/wp-json/learnpress/v1/quiz/${id}`),
+  quiz: (id, params = {}) =>
+    config.get(`/wp-json/learnpress/v1/quiz/${id}`, {...params}),
 
   quizStart: params => config.post('/wp-json/learnpress/v1/quiz/start', params),
 
@@ -180,9 +182,44 @@ const Client = {
     }),
 
   getCertificates: params =>
-    config.get('/wp-json/custom-api/v1/get-certificate-url', {
+    config.get('/wp-json/custom-api/v2/get-certificate-url', {
       ...params,
     }),
+
+finishCourseCustom: async params => {
+    const url = getApiUrl() + '/wp-json/custom-api/v1/finish-course';
+
+    try {
+      console.log('finishCourseCustom URL:', url);
+      console.log('finishCourseCustom PAYLOAD:', params);
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params),
+      });
+
+      const raw = await res.text();
+
+      console.log('finishCourseCustom STATUS:', res.status);
+      console.log('finishCourseCustom RAW RESPONSE:', raw);
+
+      try {
+        const parsed = JSON.parse(raw);
+        console.log('finishCourseCustom PARSED RESPONSE:', parsed);
+        return parsed;
+      } catch (e) {
+        console.log('finishCourseCustom JSON PARSE ERROR:', e.message);
+        return null;
+      }
+    } catch (err) {
+      console.log('finishCourseCustom FETCH ERROR:', err);
+      return null;
+    }
+  },
+    
 };
 
 export default Client;

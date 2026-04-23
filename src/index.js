@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, {useEffect} from 'react';
-import {Animated, DeviceEventEmitter, StatusBar, StyleSheet, Text, View} from 'react-native';
+import {Animated, DeviceEventEmitter, Platform, StatusBar, StyleSheet, Text, View} from 'react-native';
 import {PersistGate} from 'redux-persist/integration/react';
 import {NavigationContainer} from '@react-navigation/native';
 import {Provider} from 'react-redux';
@@ -186,7 +186,9 @@ const MyApp = () => {
   );
 };
 
-export default codePush(MyApp);
+const codePushDeploymentKey = Platform.OS === 'ios' ? CODE_PUSH.ios : CODE_PUSH.android;
+
+export default codePushDeploymentKey ? codePush({deploymentKey: codePushDeploymentKey})(MyApp) : MyApp;
 
 const styles = StyleSheet.create({
   splashOverlay: {

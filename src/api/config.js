@@ -23,11 +23,52 @@ const callRequestWithTimeOut = async request => {
 const onResponse = async (request, result) => {
   try {
     const body = await result.text();
-    const newBody = JSON.parse(body);
+    let newBody = null;
+    try {
+      newBody = JSON.parse(body);
+    } catch (e) {
+      tronLog('onResponseParseError', request?.url, body);
+      if (request?.url?.includes('/wp-json/learnpress/v1/users/reset-password')) {
+        console.log('reset-password status:', result?.status);
+        console.log('reset-password non-JSON response:', body);
+      }
+      return {
+        code: 'error',
+        message: 'Invalid server response. Please try again.',
+        status: result?.status,
+      };
+    }
+
+    if (request?.url?.includes('/wp-json/learnpress/v1/users/reset-password')) {
+      console.log('reset-password status:', result?.status);
+      if (body === '' || body === null || body === undefined) {
+        return {
+          code: 'error',
+          message: 'Empty response from server. Please try again.',
+          status: result?.status,
+        };
+      }
+    }
 
     // Targeted debug: log response for courses2 requests alongside existing URL debug
     if (request?.url?.includes('/wp-json/learnpress/v1/courses2')) {
       console.debug('Response (courses2):', newBody);
+    }
+    if (request?.url?.includes('/wp-json/learnpress/v1/courses/finish')) {
+      console.log('finishCourse status:', result?.status);
+      console.log('finishCourse response:', newBody);
+    }
+    if (request?.url?.includes('/wp-json/learnpress/v1/lessons/finish')) {
+      console.log('completeLesson status:', result?.status);
+      console.log('completeLesson response:', newBody);
+    }
+    if (request?.url?.includes('/wp-json/learnpress/v1/quiz/start')) {
+      console.log('quizStart status:', result?.status);
+      console.log('quizStart response:', newBody);
+    }
+    if (request?.url?.includes('/wp-json/learnpress/v1/quiz/finish')) {
+      console.log('quizFinish status:', result?.status);
+      console.log('quizFinish response:', newBody);
     }
 
     if (result.status === 401) {
@@ -95,6 +136,25 @@ const config = {
 
     const request = {url, options};
 
+    if (
+      endpoint?.includes('/wp-json/learnpress/v1/courses/') ||
+      endpoint?.includes('/wp-json/learnpress/v1/lessons/') ||
+      endpoint?.includes('/wp-json/learnpress/v1/quiz/')
+    ) {
+      const {user} = store.getState();
+      const safeHeaders = {
+        ...options.headers,
+        ...(options.headers?.Authorization ? {Authorization: 'Bearer ***'} : {}),
+      };
+      console.log('GET learnpress url:', url);
+      console.log('GET learnpress params:', params);
+      console.log('GET learnpress auth:', {
+        hasToken: !!user?.token,
+        userId: user?.info?.id ?? user?.info?.user_id ?? null,
+      });
+      console.log('GET learnpress request:', {method: options.method, headers: safeHeaders});
+    }
+
     return callRequestWithTimeOut(
       fetch(url, options).then(result => onResponse(request, result)),
     );
@@ -115,6 +175,44 @@ const config = {
     };
 
     console.debug(url);
+    if (endpoint?.includes('/wp-json/learnpress/v1/users/reset-password')) {
+      console.log('POST reset-password url:', url);
+      console.log('POST reset-password payload:', params);
+    }
+    if (endpoint?.includes('/wp-json/learnpress/v1/courses/finish')) {
+      const safeHeaders = {
+        ...options.headers,
+        ...(options.headers?.Authorization ? {Authorization: 'Bearer ***'} : {}),
+      };
+      const {user} = store.getState();
+      console.log('POST finishCourse url:', url);
+      console.log('POST finishCourse payload:', params);
+      console.log('POST finishCourse auth:', {
+        hasToken: !!user?.token,
+        userId: user?.info?.id ?? user?.info?.user_id ?? null,
+      });
+      console.log('POST finishCourse request:', {method: options.method, headers: safeHeaders});
+    }
+    if (
+      endpoint?.includes('/wp-json/learnpress/v1/lessons/finish') ||
+      endpoint?.includes('/wp-json/learnpress/v1/quiz/start') ||
+      endpoint?.includes('/wp-json/learnpress/v1/quiz/finish') ||
+      endpoint?.includes('/wp-json/learnpress/v1/courses/retake') ||
+      endpoint?.includes('/wp-json/learnpress/v1/courses/enroll')
+    ) {
+      const safeHeaders = {
+        ...options.headers,
+        ...(options.headers?.Authorization ? {Authorization: 'Bearer ***'} : {}),
+      };
+      const {user} = store.getState();
+      console.log('POST learnpress url:', url);
+      console.log('POST learnpress payload:', params);
+      console.log('POST learnpress auth:', {
+        hasToken: !!user?.token,
+        userId: user?.info?.id ?? user?.info?.user_id ?? null,
+      });
+      console.log('POST learnpress request:', {method: options.method, headers: safeHeaders});
+    }
 
     return callRequestWithTimeOut(
       fetch(url, options).then(result => onResponse(request, result)),

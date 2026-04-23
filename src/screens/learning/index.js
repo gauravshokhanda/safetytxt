@@ -15,7 +15,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { withTranslation } from 'react-i18next';
-import { Client } from 'app-api';
+import { Client, getApiUrl } from 'app-api';
 import { Images } from 'app-assets';
 import IconI from 'react-native-vector-icons/Ionicons';
 import IconF from 'react-native-vector-icons/Feather';
@@ -61,9 +61,9 @@ class Learning extends Component {
   async componentDidMount() {
     const { route } = this.props;
     const { item, index, idCourse } = route.params;
-    await this.getLesson(item);
     this.item = item;
     this.idCourse = idCourse;
+    await this.getLesson(item);
     this.setState({
       activeSections: [index],
     });
@@ -93,7 +93,9 @@ class Learning extends Component {
       isAssignment: false,
       forceRenderAccordion: false,
     });
-    const response = await Client.quiz(this.item.id);
+    const response = await Client.quiz(this.item.id, {
+      ...(this.idCourse ? {course_id: this.idCourse} : {}),
+    });
     console.log(response, "quiz response")
     this.setState({
       data: response,
@@ -153,7 +155,9 @@ class Learning extends Component {
     // if (this.id === item.id) return;
     dispatch(showLoading(true));
     if (item.type === 'lp_lesson') {
-      const response = await Client.lessonWithId(item.id);
+      const response = await Client.lessonWithId(item.id, {
+        ...(this.idCourse ? {course_id: this.idCourse} : {}),
+      });
       this.setState({
         data: response,
         isLesson: true,
@@ -162,7 +166,9 @@ class Learning extends Component {
       });
     }
     if (item.type === 'lp_quiz') {
-      const response = await Client.quiz(item.id);
+      const response = await Client.quiz(item.id, {
+        ...(this.idCourse ? {course_id: this.idCourse} : {}),
+      });
       tronLog('response123123123', response);
       this.setState({
         data: response,
@@ -239,6 +245,7 @@ class Learning extends Component {
     const { t, dispatch } = this.props;
     const param = {
       id: this.id,
+      ...(this.idCourse ? {course_id: this.idCourse} : {}),
     };
 
     await dispatch(showLoading(true));
@@ -389,6 +396,7 @@ class Learning extends Component {
 
     const param = {
       id: this.id,
+      ...(this.idCourse ? {course_id: this.idCourse} : {}),
     };
 
     // Check if question is empty
@@ -477,6 +485,7 @@ class Learning extends Component {
     const param = {
       id: this.item?.id || route.params?.item?.id || 0,
       answered: itemTemp,
+      ...(this.idCourse ? {course_id: this.idCourse} : {}),
     };
 
     const response = await Client.quizFinish(param);
@@ -492,44 +501,113 @@ class Learning extends Component {
     dispatch(showLoading(false));
   };
 
-  onFinishCourse = async () => {
-    const { t } = this.props;
-    Alert.alert(
-      t('learningScreen.finishCourseAlert.title'),
-      t('learningScreen.finishCourseAlert.description'),
-      [
-        {
-          text: t('learningScreen.finishCourseAlert.cancel'),
-          onPress: () => { },
-          style: 'cancel',
-        },
-        {
-          text: t('learningScreen.finishCourseAlert.ok'),
-          onPress: async () => {
-            const { dispatch, navigation } = this.props;
-            dispatch(showLoading(true));
-            const param = {
-              id: this.idCourse,
-            };
+  // onFinishCourse = async () => {
+  //   const { t } = this.props;
+  //   Alert.alert(
+  //     t('learningScreen.finishCourseAlert.title'),
+  //     t('learningScreen.finishCourseAlert.description'),
+  //     [
+  //       {
+  //         text: t('learningScreen.finishCourseAlert.cancel'),
+  //         onPress: () => { },
+  //         style: 'cancel',
+  //       },
+  //       {
+  //         text: t('learningScreen.finishCourseAlert.ok'),
+  //         onPress: async () => {
+  //           const { dispatch, navigation } = this.props;
+  //           dispatch(showLoading(true));
+  //           try {
+  //             if (!this.idCourse) {
+  //               dispatch(showLoading(false));
+  //               Alert.alert('Error', 'Missing course id.');
+  //               return;
+  //             }
 
-            const response = await Client.finishCourse(param);
-            tronLog('finishcourse', response);
-            dispatch(showLoading(false));
-            if (response.status === 'success') {
-              Alert.alert(response.message);
-              DeviceEventEmitter.emit('loadCourseDetail');
-              DeviceEventEmitter.emit('loadMyCourse');
-              navigation.goBack();
-            } else {
-              Alert.alert(response.message);
-            }
-          },
-        },
-      ],
-      { cancelable: false },
-    );
-  };
+  //             const param = {
+  //               id: this.idCourse,
+  //               course_id: this.idCourse,
+  //             };
 
+  //             console.log('finishCourse payload:', param);
+  //             const response = await Client.finishCourse(param);
+  //             tronLog('finishcourse', response);
+  //             dispatch(showLoading(false));
+
+  //             if (response?.status === 'success') {
+  //               Alert.alert(response?.message || 'Course finished.');
+  //               DeviceEventEmitter.emit('loadCourseDetail');
+  //               DeviceEventEmitter.emit('loadMyCourse');
+  //               navigation.goBack();
+  //               return;
+  //             }
+
+  //             Alert.alert(response?.message || 'Finish course failed.');
+  //           } catch (e) {
+  //             dispatch(showLoading(false));
+  //             Alert.alert('Error', e?.message || 'Finish course failed.');
+  //           }
+  //         },
+  //       },
+  //     ],
+  //     { cancelable: false },
+  //   );
+  // };
+
+
+ onFinishCourse = async () => {
+  const {t} = this.props;
+
+  Alert.alert(
+    t('learningScreen.finishCourseAlert.title'),
+    t('learningScreen.finishCourseAlert.description'),
+    [
+      {
+        text: t('learningScreen.finishCourseAlert.cancel'),
+        style: 'cancel',
+      },
+      {
+        text: t('learningScreen.finishCourseAlert.ok'),
+        onPress: async () => {
+          const {dispatch, navigation} = this.props;
+
+          if (!this.idCourse) {
+            Alert.alert('Error', 'Missing course id.');
+            return;
+          }
+
+          const {user} = this.props;
+          const userId = user?.info?.id ?? user?.info?.user_id ?? null;
+
+          const payload = {
+            course_id: this.idCourse,
+            user_id: userId,
+          };
+
+          console.log('finishCourseCustom payload:', payload);
+
+          dispatch(showLoading(true));
+
+          const response = await Client.finishCourseCustom(payload);
+
+          console.log('finishCourseCustom response:', response);
+
+          dispatch(showLoading(false));
+
+          if (response?.status === 'success') {
+            Alert.alert(response?.message || 'Course finished successfully');
+            DeviceEventEmitter.emit('loadCourseDetail');
+            DeviceEventEmitter.emit('loadMyCourse');
+            navigation.goBack();
+          } else {
+            Alert.alert(response?.message || 'Unable to finish course');
+          }
+        },
+      },
+    ],
+    {cancelable: false},
+  );
+};
   showHint = () => {
     const { t } = this.props;
     const { itemQuestion } = this.state;
@@ -1459,8 +1537,9 @@ class Learning extends Component {
     );
   }
 }
-const mapStateToProps = ({ course }) => ({
+const mapStateToProps = ({course, user}) => ({
   course,
+  user,
 });
 const mapDispatchToProps = dispatch => ({ dispatch });
 

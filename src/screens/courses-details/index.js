@@ -469,8 +469,15 @@ class CoursesDetails extends Component {
     const data = course?.data;
     const courseStatus = data?.course_data?.status;
     const coursePassed = data?.course_data?.graduation;
+    const courseProgress = Number(data?.course_data?.result?.result ?? 0);
 
-    if (courseStatus === 'finished' && coursePassed === 'passed') {
+    const canShowCertificate =
+      coursePassed === 'passed' ||
+      ((courseStatus === 'enrolled' || courseStatus === 'finished') &&
+        courseProgress >= 100 &&
+        coursePassed !== 'failed');
+
+    if (canShowCertificate) {
       return (
         <TouchableOpacity
           style={[styles.btnAddToCart, { marginTop: 10 }]}
@@ -762,20 +769,35 @@ class CoursesDetails extends Component {
 
   fetchCertificateUrl = async (courseId, userId) => {
     try {
-      const response = await fetch(
-        'https://safetytxt.com/wp-json/custom-api/v1/get-certificate-url',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            course_id: courseId,
-            user_id: userId,
-          }),
+      const url =
+        'https://safetytxt.com/wp-json/custom-api/v2/get-certificate-url';
+      const payload = {
+        course_id: courseId,
+        user_id: userId,
+      };
+      console.log('getCertificateUrl URL:', url);
+      console.log('getCertificateUrl PAYLOAD:', payload);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
-      const data = await response.json();
+        body: JSON.stringify(payload),
+      });
+
+      const raw = await response.text();
+      console.log('getCertificateUrl STATUS:', response.status);
+      console.log('getCertificateUrl RAW RESPONSE:', raw);
+
+      let data = null;
+      try {
+        data = JSON.parse(raw);
+        console.log('getCertificateUrl PARSED RESPONSE:', data);
+      } catch (e) {
+        console.log('getCertificateUrl JSON PARSE ERROR:', e?.message);
+      }
+
       if (response.ok && data?.certificate_url) {
         // If API call is successful, set the certificate URL and show the WebView
         this.setState({
@@ -789,7 +811,7 @@ class CoursesDetails extends Component {
         Alert.alert(
           'Error',
           data?.message ||
-          'Failed to fetch the certificate URL. Please try again later.',
+            'Failed to fetch the certificate URL. Please try again later.',
         );
       }
     } catch (error) {

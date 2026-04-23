@@ -29,6 +29,8 @@ class Forgot extends PureComponent {
     };
 
     this.backHandler = null;
+    this.keyboardDidShowListener = null;
+    this.keyboardDidHideListener = null;
   }
 
   componentDidMount() {
@@ -50,8 +52,12 @@ class Forgot extends PureComponent {
     if (this.backHandler) {
       this.backHandler.remove();
     }
-    this.keyboardDidShowListener.remove();
-    this.keyboardDidHideListener.remove();
+    if (this.keyboardDidShowListener) {
+      this.keyboardDidShowListener.remove();
+    }
+    if (this.keyboardDidHideListener) {
+      this.keyboardDidHideListener.remove();
+    }
   }
 
   _keyboardDidShow = () => {
@@ -73,24 +79,35 @@ class Forgot extends PureComponent {
 
   onBack = () => {
     const { navigation } = this.props;
-    navigation.goBack();
+    if (navigation?.canGoBack?.()) {
+      navigation.goBack();
+    } else {
+      navigation?.navigate?.('LoginScreen');
+    }
   };
 
   onSend = async () => {
     const { email } = this.state;
+    console.log(email);
+    Keyboard.dismiss();
     if (!ValidateEmail(email)) {
       Alert.alert('Please enter a valid email address');
       return;
     }
     try {
-      const response = await Client.resetEmail({ user_login: email });
-      if (response.code === 'success') {
+      const payload = { user_login: email };
+      console.log('resetEmail payload:', payload);
+      const response = await Client.resetEmail(payload);
+      console.log(response);
+      if (response?.code === 'success') {
         Alert.alert(response.message);
       } else {
-        Alert.alert(response?.message);
+        Alert.alert(response?.message || 'Something went wrong. Please try again.');
+        console.log(response);
       }
     } catch (e) {
-      Alert.alert(e);
+      Alert.alert('Error', e?.message || String(e));
+      console.log(e);
     }
   };
 
