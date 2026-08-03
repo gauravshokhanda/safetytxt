@@ -1,4 +1,6 @@
 node_modules/
+android
+.android-sdk/
 
 .DS_Store
 *.log
@@ -32,6 +34,7 @@ android/.idea/
 android/build/
 android/app/build/
 android/local.properties
+android/upload-keystore.properties
 android/captures/
 *.keystore
 *.jks

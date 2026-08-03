@@ -28,13 +28,18 @@ if (TextInput.defaultProps == null) {
 TextInput.defaultProps.allowFontScaling = false;
 
 messaging().setBackgroundMessageHandler(async remoteMessage => {
-  await notifee.displayNotification({
-    title: remoteMessage.notification.title,
-    body: remoteMessage.notification.body,
-    android: {
-      channelId: 'default',
-    },
-  });
+  const title = remoteMessage?.notification?.title || remoteMessage?.data?.title;
+  const body = remoteMessage?.notification?.body || remoteMessage?.data?.body;
+
+  if (title || body) {
+    await notifee.displayNotification({
+      title,
+      body,
+      android: {
+        channelId: 'default',
+      },
+    });
+  }
 
   notifee.incrementBadgeCount(1);
 });
@@ -51,3 +56,4 @@ notifee.onBackgroundEvent(async ({type, detail}) => {
 });
 
 AppRegistry.registerComponent(appName, () => App);
+

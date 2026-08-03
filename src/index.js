@@ -83,18 +83,24 @@ const MyApp = () => {
     await registerFCMToken();
 
     messaging().onMessage(remoteMessage => {
-      notifee.displayNotification({
-        title: remoteMessage.notification.title,
-        body: remoteMessage.notification.body,
-        android: {
-          channelId: 'default',
-        },
-      });
+      const title =
+        remoteMessage?.notification?.title || remoteMessage?.data?.title;
+      const body = remoteMessage?.notification?.body || remoteMessage?.data?.body;
+
+      if (title || body) {
+        notifee.displayNotification({
+          title,
+          body,
+          android: {
+            channelId: 'default',
+          },
+        });
+      }
 
       DeviceEventEmitter.emit('notificationReceived');
     });
 
-    messaging().onNotificationOpenedApp(remoteMessage => {
+    messaging().onNotificationOpenedApp(() => {
       navigate('NotificationsScreen');
     });
 
@@ -207,3 +213,4 @@ const styles = StyleSheet.create({
     color: '#000',
   },
 });
+

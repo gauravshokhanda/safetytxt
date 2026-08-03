@@ -125,9 +125,9 @@ class Login extends PureComponent {
       }
 
       DeviceEventEmitter.emit('notificationReceived');
-    } else if (response.code.includes('incorrect_password')) {
+    } else if (response?.code?.includes('incorrect_password')) {
       Alert.alert('', t('loginScreen.passwordNotCorrect'));
-    } else if (response.code.includes('invalid_username')) {
+    } else if (response?.code?.includes('invalid_username')) {
       Alert.alert('', t('loginScreen.usernameNotCorrect'));
     } else {
       Alert.alert('', t('loginScreen.notFound'));
@@ -278,3 +278,4 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(withTranslation()(Login));
+

@@ -11,11 +11,11 @@ let HEADERS = {
 };
 
 const callRequestWithTimeOut = async request => {
-  const promise2 = new Promise(resolve => {
+  const timeout = new Promise(resolve => {
     setTimeout(resolve, 15000, null);
   });
 
-  const resultRace = await new Promise.race([request, promise2]);
+  const resultRace = await Promise.race([request, timeout]);
 
   return resultRace;
 };
@@ -306,3 +306,4 @@ const setClientLocale = (locale = 'en') => {
 };
 
 export {config, getApiUrl, setToken, setClientLocale};
+

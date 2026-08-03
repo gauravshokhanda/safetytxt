@@ -28,7 +28,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import {
   getAvailablePurchases,
   initConnection,
-  getProducts,
+  fetchProducts,
   purchaseErrorListener,
   purchaseUpdatedListener,
   endConnection,
@@ -183,7 +183,7 @@ class CoursesDetails extends Component {
     await dispatch(showLoading(true));
 
     try {
-      let { ids } = productIAP;
+      let ids = Array.isArray(productIAP?.ids) ? productIAP.ids : [];
 
       if (ids.length === 0) {
         const response = await Client.getProductIAP();
@@ -192,14 +192,14 @@ class CoursesDetails extends Component {
           ids = [];
           await dispatch(saveProductIAP([]));
         } else {
-          ids = response;
-          await dispatch(saveProductIAP(response));
+          ids = Array.isArray(response) ? response : [];
+          await dispatch(saveProductIAP(ids));
         }
       }
 
       await initConnection();
 
-      await getProducts({ skus: ids });
+      await fetchProducts({ skus: ids, type: 'in-app' });
     } catch (e) {
       console.log('error', e.message);
     }
@@ -665,17 +665,22 @@ class CoursesDetails extends Component {
 
     await dispatch(showLoading(true));
     try {
-      await requestPurchase(
-        Platform.select({
+      await requestPurchase({
+        request: Platform.select({
           ios: {
-            sku: id,
-            andDangerouslyFinishTransactionAutomaticallyIOS: false,
+            apple: {
+              sku: id,
+              andDangerouslyFinishTransactionAutomatically: false,
+            },
           },
           android: {
-            skus: [id],
+            google: {
+              skus: [id],
+            },
           },
         }),
-      );
+        type: 'in-app',
+      });
     } catch (err) {
       console.log(err.message);
     }
@@ -1410,3 +1415,4 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(withTranslation()(CoursesDetails));
+
