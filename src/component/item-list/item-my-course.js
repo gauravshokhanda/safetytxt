@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { withTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
+import {getImageSource} from 'app-common';
 import styles from './styles/item-my-course';
 
 class ItemMyCourse extends PureComponent {
@@ -24,9 +25,7 @@ class ItemMyCourse extends PureComponent {
         onPress={() => this.onNavigateDetail(item)}
         style={styles.container}
       >
-        {typeof item.image === 'string' && item.image.startsWith('http') ? (
-          <FastImage source={{ uri: item.image }} style={styles.image} />
-        ) : null}
+        <FastImage source={getImageSource(item?.image)} style={styles.image} />
 
         <View style={styles.viewContent}>
           {categories && (
@@ -98,3 +97,4 @@ class ItemMyCourse extends PureComponent {
   }
 }
 export default withTranslation()(ItemMyCourse);
+

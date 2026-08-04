@@ -17,6 +17,7 @@ import FastImage from 'react-native-fast-image';
 import { withTranslation } from 'react-i18next';
 import { Client } from 'app-api';
 import { Images } from 'app-assets';
+import {getImageSource} from 'app-common';
 import IconI from 'react-native-vector-icons/Ionicons';
 import IconF from 'react-native-vector-icons/Feather';
 import { Rating } from 'react-native-ratings';
@@ -934,9 +935,7 @@ class CoursesDetails extends Component {
           <FastImage
             style={styles.imageBanner}
             resizeMode={FastImage.resizeMode.contain}
-            source={{
-              uri: data?.image,
-            }}>
+            source={getImageSource(data?.image)}>
             {/* <TouchableOpacity
               onPress={this.onToggleWishlish}
               style={{
@@ -1415,4 +1414,5 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(withTranslation()(CoursesDetails));
+
 

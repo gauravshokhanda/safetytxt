@@ -50,6 +50,7 @@ const icEnterEmail = require('./img/icon/icon-enter-email.png');
 const iconHome = require('./img/icon/icon-home.png');
 const iconSearch = require('./img/icon/icon-search.png');
 const iconNotification = require('./img/icon/icon-notification.png');
+const thumbDefault = require('./img/thumb_default.jpg');
 const iconLession = require('./img/icon/icon-lession.png');
 const iconQuiz = require('./img/icon/icon-quiz.png');
 const iconAssignment = require('./img/icon/icon-assignment.png');
@@ -64,6 +65,7 @@ const Images = {
   iconDefaultUser,
   iconLogOut,
   iconNotification,
+  thumbDefault,
   iconTabProfile,
   iconTabMyCourse,
   iconWishlist,
@@ -108,3 +110,4 @@ const Images = {
 };
 
 export {Images, Colors};
+

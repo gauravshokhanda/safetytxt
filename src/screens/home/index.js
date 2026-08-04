@@ -343,8 +343,8 @@ class Home extends PureComponent {
                   {dataOverview?.name}
                 </Text>
                 <Text style={styles.txt1}>
-                  {dataOverview?.sections.length}{' '}
-                  {dataOverview?.sections.length > 1
+                  {dataOverview?.sections?.length || 0}{' '}
+                  {(dataOverview?.sections?.length || 0) > 1
                     ? t('home.overview.sections').toUpperCase()
                     : t('home.overview.section').toUpperCase()}
                 </Text>
@@ -545,3 +545,4 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(withTranslation()(Home));
+

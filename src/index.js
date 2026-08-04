@@ -68,7 +68,7 @@ const MyApp = () => {
         console.log(e);
       }
 
-      await onNotification();
+      await onNotification().catch(e => console.log('onNotificationError', e));
     })();
   }, []);
 
@@ -213,4 +213,5 @@ const styles = StyleSheet.create({
     color: '#000',
   },
 });
+
 

@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { withTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
+import {getImageSource} from 'app-common';
 import IconI from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 import { Client } from 'app-api';
@@ -59,7 +60,7 @@ class PopularCoursesHorizontal extends PureComponent {
           </View>
         ) : null}
         <View>
-          <FastImage style={styles.image} source={{ uri: item.image }} />
+          <FastImage style={styles.image} source={getImageSource(item?.image)} />
           {/* <TouchableOpacity
             style={{ position: 'absolute', top: 10, right: 15 }}
             onPress={() => this.onToggleWishlish()}
@@ -161,3 +162,4 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withTranslation()(PopularCoursesHorizontal));
+

@@ -17,6 +17,7 @@ import {
 import {tronLog} from './log';
 
 import {deleteFCMToken, registerFCMToken} from './fcmToken';
+import {getImageSource} from './image';
 
 export {
   // datetime
@@ -40,4 +41,6 @@ export {
   tronLog,
   deleteFCMToken,
   registerFCMToken,
+  getImageSource,
 };
+

@@ -18,6 +18,7 @@ import {
   tronLog,
   deleteFCMToken,
   registerFCMToken,
+  getImageSource,
 } from './util';
 
 export {
@@ -39,4 +40,6 @@ export {
   tronLog,
   deleteFCMToken,
   registerFCMToken,
+  getImageSource,
 };
+

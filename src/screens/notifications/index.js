@@ -18,6 +18,7 @@ import notifee from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
 import {useSelector, useDispatch} from 'react-redux';
 import {Images} from 'app-assets';
+import {getImageSource} from 'app-common';
 import {registerFCMToken} from 'app-common';
 import {
   saveNotifications as saveStoreNotifications,
@@ -147,7 +148,7 @@ export default function Notifications({navigation}) {
           },
         ]}>
         {item.image && (
-          <FastImage source={{uri: item.image}} style={styles.itemImage} />
+          <FastImage source={getImageSource(item?.image)} style={styles.itemImage} />
         )}
         <View style={styles.itemContentContainer}>
           {item.title ? (
@@ -327,3 +328,4 @@ export default function Notifications({navigation}) {
     </View>
   );
 }
+

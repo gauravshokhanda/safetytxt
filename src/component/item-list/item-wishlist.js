@@ -4,6 +4,7 @@ import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { withTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
 import { Images } from 'app-assets';
+import {getImageSource} from 'app-common';
 import IconI from 'react-native-vector-icons/Ionicons';
 // import { tronLog } from 'app-common';
 import { Client } from 'app-api';
@@ -44,7 +45,7 @@ class ItemWishlist extends PureComponent {
         style={styles.container}
       >
         <FastImage
-          source={{ uri: item?.image }}
+          source={getImageSource(item?.image)}
           style={styles.image}
           imageStyle={{ borderRadius: 6 }}
         >
@@ -173,3 +174,4 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withTranslation()(ItemWishlist));
+
