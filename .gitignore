@@ -3,6 +3,9 @@ android
 .android-sdk/
 
 .DS_Store
+Thumbs.db
+*.swp
+*.swo
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -42,6 +45,10 @@ android/captures/
 ios/Pods/
 ios/build/
 ios/DerivedData/
+ios/*/*.ipa
+ios/*/Packaging.log
+ios/*/ExportOptions.plist
+ios/*/DistributionSummary.plist
 ios/**/*.xcuserstate
 ios/**/xcuserdata/
 *.xcuserstate
