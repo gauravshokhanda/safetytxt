@@ -1,7 +1,8 @@
 buildscript {
     ext {
         buildToolsVersion = "34.0.0"
-        minSdkVersion = 23
+        // React Native 0.82 Hermes tooling requires Android API level 24 or newer.
+        minSdkVersion = 24
         compileSdkVersion = 34
         targetSdkVersion = 34
         supportLibVersion = "28.0.0"
