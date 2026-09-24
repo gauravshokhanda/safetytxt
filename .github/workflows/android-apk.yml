@@ -10,7 +10,7 @@ permissions:
 jobs:
   build-android:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 120
 
     steps:
       - name: Check out source
