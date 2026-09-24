@@ -5999,10 +5999,10 @@ react-native-modal@^14.0.0-rc.1:
   dependencies:
     react-native-animatable "1.4.0"
 
-react-native-nitro-modules@^0.36.1:
-  version "0.36.1"
-  resolved "https://registry.npmjs.org/react-native-nitro-modules/-/react-native-nitro-modules-0.36.1.tgz"
-  integrity sha512-kBv/VvKqAmkXAvP1DxJMC9b/fRhh7JdSO4EUnPP46hJjrIFeFR8AwKm8mYaKZEuF014M/TVdv2vomVUW0umsQQ==
+react-native-nitro-modules@^0.36.1, react-native-nitro-modules@^0.36.5:
+  version "0.36.5"
+  resolved "https://registry.npmjs.org/react-native-nitro-modules/-/react-native-nitro-modules-0.36.5.tgz"
+  integrity sha512-SJby84+hovD70JmQ1fq+56tw3oapJeChehUqXA4Gqjm+ktJhMAcj8LGwoAjStSOUwRaK7czbzBPB0Widj+EDoQ==
 
 react-native-ratings@^8.1.0:
   version "8.1.0"
