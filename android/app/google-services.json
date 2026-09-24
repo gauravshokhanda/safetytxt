@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "950632502651",
+    "project_id": "test-f549d",
+    "storage_bucket": "test-f549d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:950632502651:android:b8f2a98acadcb49a2519de",
+        "android_client_info": {
+          "package_name": "com.eduma.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6WbmmGEgg2Wqet5xN0418pd1LM_jQyfo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
