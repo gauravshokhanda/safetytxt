@@ -1,5 +1,11 @@
-rootProject.name = 'Eduma'
-apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
-include ':app', ':react-native-code-push'
-includeBuild('../node_modules/@react-native/gradle-plugin')
-project(':react-native-code-push').projectDir = new File(rootProject.projectDir, '../node_modules/@revopush/react-native-code-push/android/app')
+pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
+
+plugins { id("com.facebook.react.settings") }
+
+extensions.configure(com.facebook.react.ReactSettingsExtension) { extension ->
+    extension.autolinkLibrariesFromCommand()
+}
+
+rootProject.name = "Eduma"
+include(":app")
+includeBuild("../node_modules/@react-native/gradle-plugin")

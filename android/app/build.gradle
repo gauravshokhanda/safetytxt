@@ -8,6 +8,7 @@ apply plugin: "com.google.gms.google-services"
  * By default you don't need to apply any configuration, just uncomment the lines you need.
  */
 react {
+    autolinkLibrariesWithApp()
     /* Folders */
     //   The root of your project, i.e. where "package.json" lives. Default is '..'
     // root = file("../")
@@ -119,7 +120,6 @@ dependencies {
     }
 }
 
-apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
 project.ext.vectoricons = [
     iconFontNames: [ 'AntDesign.ttf', 'Entypo.ttf', 'EvilIcons.ttf', 'Feather.ttf', 'FontAwesome.ttf', 'FontAwesome5_Brands.ttf', 'FontAwesome5_Regular.ttf', 'FontAwesome5_Solid.ttf', 'Foundation.ttf', 'Ionicons.ttf', 'MaterialIcons.ttf', 'MaterialCommunityIcons.ttf', 'SimpleLineIcons.ttf', 'Octicons.ttf', 'Zocial.ttf', 'Fontisto.ttf' ]
 ]
