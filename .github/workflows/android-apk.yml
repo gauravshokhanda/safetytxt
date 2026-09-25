@@ -38,15 +38,12 @@ jobs:
       - name: Install JavaScript dependencies
         run: npm ci
 
-      - name: Package application and icon fonts
+      - name: Package application fonts
         run: |
           mkdir -p android/app/src/main/assets/fonts
-          cp node_modules/react-native-vector-icons/Fonts/*.ttf android/app/src/main/assets/fonts/
           if [ -d src/assets/fonts ]; then
             cp src/assets/fonts/*.ttf android/app/src/main/assets/fonts/ || true
           fi
-          test -f android/app/src/main/assets/fonts/Ionicons.ttf
-          test -f android/app/src/main/assets/fonts/MaterialCommunityIcons.ttf
 
       - name: Build release APK
         working-directory: android
