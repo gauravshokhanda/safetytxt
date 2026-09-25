@@ -33,7 +33,12 @@ class MainApplication : Application(), ReactApplication {
         // the CodePush runtime determine where to get the JS
         // bundle location from on each app start
         override fun getJSBundleFile(): String {
-            return CodePush.getJSBundleFile()
+            val deploymentKey = applicationContext.getString(R.string.CodePushDeploymentKey)
+            return if (deploymentKey.isBlank() || deploymentKey == "DeploymentKey") {
+                super.getJSBundleFile() ?: "assets://index.android.bundle"
+            } else {
+                CodePush.getJSBundleFile()
+            }
         }
       }
 

@@ -127,7 +127,7 @@ apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 afterEvaluate {
     def copyVectorIconFonts = tasks.findByName("copyReactNativeVectorIconFonts")
     if (copyVectorIconFonts != null) {
-        tasks.matching { it.name == "generateReleaseLintVitalReportModel" }.configureEach {
+        tasks.matching { it.name in ["generateReleaseLintVitalReportModel", "lintVitalAnalyzeRelease"] }.configureEach {
             dependsOn(copyVectorIconFonts)
         }
     }
