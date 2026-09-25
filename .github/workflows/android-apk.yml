@@ -45,6 +45,19 @@ jobs:
             cp src/assets/fonts/*.ttf android/app/src/main/assets/fonts/ || true
           fi
 
+      - name: Generate test signing keystore
+        working-directory: android/app
+        run: |
+          keytool -genkeypair -v -storetype JKS \
+            -keystore debug.keystore \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+
       - name: Build release APK
         working-directory: android
         run: ./gradlew generateCodegenArtifactsFromSchema assembleRelease --no-daemon
